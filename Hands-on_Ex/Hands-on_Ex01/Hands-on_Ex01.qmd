@@ -3,9 +3,9 @@ title: "Hands-on Exercise 1"
 author: "Fu Weiming"
 ---
 
-# Getting Started {style="color: blue"}
+# 1. Getting Started {style="color: yellow"}
 
-## Install and launching R packages {style="color: gray"}
+## 1.1 Install and launching R packages {style="color: white"}
 
 *The code chunk below uses p_load() of pacman package to check if tidyverse packages are installed in the computer. If they are, then they will be launched into R.*
 
@@ -13,16 +13,318 @@ author: "Fu Weiming"
 pacman::p_load(tidyverse)
 ```
 
-## Importing the data {style="color: gray"}
+## 1.2 Importing the data {style="color: white"}
 
 ```{r}
 exam_data <- read_csv("data/Exam_data.csv")
 ```
 
-# Plotting a simple bar chart {style="color: blue"}
+Summary of data imported
+
+```{r}
+summary(exam_data)
+```
+
+# 2. Plotting a simple bar chart {style="color: yellow"}
 
 ```{r}
 ggplot(data = exam_data, 
        aes(x = RACE)) +
-  geom_bar()
+  geom_bar()+
+  labs(x = "RACE", y = "Number of students", title = "Distribution of students by RACE") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+# 3. Initial Exploration of ggplot2 {style="color: yellow"}
+
+## 3.1 Exploring Base R vs ggplot2 {style="color: white"}
+
+::: panel-tabset
+## Base R
+
+```{r}
+hist(exam_data$MATHS)
+```
+
+## ggplot2
+
+```{r}
+ggplot(data=exam_data, aes(x = MATHS)) +
+  geom_histogram(bins=10, 
+                 boundary = 100,
+                 color="black", 
+                 fill="grey") +
+  ggtitle("Distribution of Maths scores")
+```
+:::
+
+# 4. Exploring ggplot2 Geometric objects {style="color: yellow"}
+
+The geom layer combines data, aesthetic mapping, a geom (geometric object), a stat (statistical transformation), and a position adjustment. Some examples of geom objects are shown below.
+
+![](images/image6.jpg){width="675"}
+
+## 4.1 Bar Chart {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x=RACE)) +
+  geom_bar(fill = "lightblue", width = 0.6, color = "darkblue") + 
+  labs(x = "RACE", y = "Number of students", title = "Distribution of students by RACE") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+  
+```
+
+## 4.2 Dot Plot {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_dotplot(binwidth = 2.5, 
+               dotsize = 0.5, fill = "lightblue") +
+  scale_y_continuous(NULL, breaks = NULL)+
+  labs(x = "MATHS score", title = "Distribution of MATHS score") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 4.3 Histogram Plot {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="darkblue", 
+                 fill="lightblue") +
+  ggtitle("Distribution of Maths scores") + 
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 4.4 Modifying a geometric object by changing aes() - Stacked Histogram {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           fill = GENDER)) +
+  geom_histogram(bins=20, 
+                 color="grey30") +
+  ggtitle("Distribution of Maths scores") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 4.5 Density Plot {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x = MATHS, color = GENDER)) +
+  geom_density() + 
+  ggtitle("Density Distribution of Maths scores by Gender") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 4.6 Box Plot {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS,       
+           x= GENDER)) +    
+  geom_boxplot(notch=TRUE, color = "blue", fill = "grey95") +
+  stat_summary(geom = "point",       
+               fun="mean",         
+               colour ="red",        
+               size=4) +
+  ggtitle("Box Plot of Maths Score by Gender") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 4.7 Violin Plot {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x = GENDER)) +
+  geom_violin(color = "blue") + 
+  ggtitle("Violin Plot of Maths Score by Gender") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 4.8 Scatter Plot {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y = ENGLISH, shape = GENDER, color = GENDER)) +
+  geom_point() + 
+  geom_smooth(linewidth = 0.5) +
+  ggtitle("Scatter Plot of Maths Score by Gender") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 4.9 Combining Box Plot and Scatter Plot {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x= GENDER)) +
+  geom_boxplot(color = "blue") +                    
+  geom_point(position="jitter", 
+             size = 0.5) +
+  ggtitle("Combination Plot of Maths Score by Gender") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 4.10 Exploring Statistics functions {style="color: white"}
+
+Using stat_summary()
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, x= GENDER)) +
+  geom_boxplot() +
+  stat_summary(geom = "point",       
+               fun.y="mean",         
+               colour ="red",        
+               size=4) +
+  ggtitle("Box Plot of Maths Score by Gender") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+Using geom_() function to override default stat.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, x= GENDER)) +
+  geom_boxplot() +
+  geom_point(stat = "summary",       
+             fun="mean",         
+             colour ="red",        
+             size=4) +
+  ggtitle("Box Plot of Maths Score by Gender") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+## 4.11 Adding best fit curve on Scatter Plot {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y = ENGLISH)) +
+  geom_point() + 
+  geom_smooth(linewidth=0.5, 
+              color = "red") + 
+  geom_smooth(method = lm,
+              linewidth=0.5, 
+              color = "blue") +
+  ggtitle("Scatter Plot of Maths Score by Gender") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+# 5. Exploring ggplot2 Facet objects {style="color: yellow"}
+
+## 5.1 Using facet_wrap() {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS)) +
+  geom_histogram(bins=20) +
+    facet_wrap(~ CLASS) +
+  ggtitle("Distribution of Maths Score by Class") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 5.2 Using facet_grid() {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS)) +
+  geom_histogram(bins=20) +
+    facet_grid(~ CLASS) +
+  ggtitle("Distribution of Maths Score by Class") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 5.3 Creating Trellis Box Plot {style="color: white"}
+
+```{r}
+ggplot(data = exam_data, 
+       aes(x=CLASS, 
+           y=MATHS)) +
+  geom_boxplot() +
+  facet_wrap(~ GENDER) +
+  ggtitle("Trellis Box Plot of Maths scores") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+```{r}
+ggplot(data = exam_data, 
+       aes(x=CLASS, 
+           y=MATHS)) +
+  geom_boxplot() +
+  facet_wrap(~ GENDER, nrow = 2, strip.position = "left") +
+  ggtitle("Trellis Box Plot of Maths scores") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+# 6. Exploring ggplot2 Coordinates {style="color: yellow"}
+
+## 6.1 Horizontal Bar Chart using coord_flip() {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x=RACE)) +
+  geom_bar(fill = "lightblue") +
+  coord_flip() +
+  ggtitle("Distribution of students by Race") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## 6.2 Changing y- and x- axes range {style="color: white"}
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y = ENGLISH)) +
+  geom_point() + 
+  geom_smooth(method = lm,
+              linewidth=0.5, 
+              color = "blue") +
+  coord_cartesian(xlim = c(0,100),
+                  ylim = c(0,100)) +
+  ggtitle("Scatter Plot of Maths Score by Gender") +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+# 7. Exploring ggplot2 Themes {style="color: yellow"}
+
+## 7.1 Working with themes {style="color: white"}
+
+```{r}
+ggplot(data = exam_data, 
+       aes(x = RACE)) +
+  geom_bar(fill = "yellow") +
+  coord_flip() +
+  theme_classic() +
+  theme(panel.background = element_rect(fill = "grey70",
+                                         color = "white")) +
+  ggtitle("Distribution of students by Race") + 
+  theme(plot.title = element_text(hjust = 0.5, color = "blue"))
 ```
