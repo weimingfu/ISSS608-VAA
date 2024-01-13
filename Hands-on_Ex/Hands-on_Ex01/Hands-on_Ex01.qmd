@@ -1,6 +1,13 @@
 ---
 title: "Hands-on Exercise 1"
 author: "Fu Weiming"
+date: "January 8, 2024"
+date-modified: "January 11, 2024"
+execute:
+  eval: true
+  echo: true
+  warning: false
+editor: visual
 ---
 
 # 1. Getting Started {style="color: yellow"}
@@ -320,6 +327,7 @@ ggplot(data=exam_data,
 
 ::: panel-tabset
 ## theme_gray
+
 ```{r}
 ggplot(data = exam_data, 
        aes(x = RACE)) +
@@ -329,7 +337,9 @@ ggplot(data = exam_data,
   ggtitle("Distribution of students by Race") + 
   theme(plot.title = element_text(hjust = 0.5, color = "blue"))
 ```
+
 ## theme_minimal
+
 ```{r}
 ggplot(data = exam_data, 
        aes(x = RACE)) +
@@ -339,7 +349,9 @@ ggplot(data = exam_data,
   ggtitle("Distribution of students by Race") + 
   theme(plot.title = element_text(hjust = 0.5, color = "blue"))
 ```
+
 ## theme_bw
+
 ```{r}
 ggplot(data = exam_data, 
        aes(x = RACE)) +
@@ -349,7 +361,9 @@ ggplot(data = exam_data,
   ggtitle("Distribution of students by Race") + 
   theme(plot.title = element_text(hjust = 0.5, color = "blue"))
 ```
+
 ## theme_classic
+
 ```{r}
 ggplot(data = exam_data, 
        aes(x = RACE)) +
@@ -360,4 +374,3 @@ ggplot(data = exam_data,
   theme(plot.title = element_text(hjust = 0.5, color = "blue"))
 ```
 :::
-
