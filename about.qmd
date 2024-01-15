@@ -6,6 +6,8 @@ date-modified: "last-modified"
 
 About this site
 
+![](images/th.jpeg){fig-align="center"}
+
 This website is created with the purpose of detailing the "destinations" in the voyage of ISSS608 - Visual Analytics and Applications module, part of the SMU MITB programme, AY2023-24.
 
-Many thanks to ship captain, Prof. Kam Tin Seong, is navigating us through the world of Visual Analytics.
+Many thanks to captain, Prof. Kam Tin Seong, in navigating us through the world of Visual Analytics.

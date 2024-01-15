@@ -9,6 +9,8 @@ execute:
 editor: visual
 ---
 
+![](/images/in-class1.jpeg){fig-align="center" width="464"}
+
 ## Loading R packages
 
 In this hands-on exercise, two R packages will be used. They are:
@@ -43,7 +45,6 @@ stu_qqq_SG <- stu_qqq %>%
 write_rds(stu_qqq_SG,
           "data/stu_qqq_SG.rds")
 ```
-
 
 ```{r}
 sfu_qqq_SG <- read_rds("data/stu_qqq_SG.rds")

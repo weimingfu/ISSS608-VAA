@@ -3,11 +3,14 @@ project:
 
 website:
   title: ""
-  
+  back-to-top-navigation: true
   reader-mode: true
+  page-footer: 
+    right: "Copyright 2024"
+    background: dark
   navbar:
     logo: "images/Site_logo.png"
-    left: 
+    left:
       - text: "Hands-on Exercise"
         menu: 
         - text: "Hands-on Exercise 1"

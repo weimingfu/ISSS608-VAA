@@ -55,13 +55,13 @@ ggplot(data = exam_data,
 ### 3.1 Exploring Base R vs ggplot2 {style="color: white"}
 
 ::: panel-tabset
-## Base R
+#### Base R
 
 ```{r}
 hist(exam_data$MATHS)
 ```
 
-## ggplot2
+#### ggplot2
 
 ```{r}
 ggplot(data=exam_data, aes(x = MATHS)) +
@@ -551,7 +551,7 @@ A list of theme can be found at this [link](https://ggplot2.tidyverse.org/refere
 ### 10.1 Working with themes {style="color: white"}
 
 ::: panel-tabset
-theme_gray
+#### theme_gray
 
 ```{r}
 ggplot(data = exam_data, 
@@ -563,7 +563,7 @@ ggplot(data = exam_data,
   theme(plot.title = element_text(hjust = 0.5, color = "blue"))
 ```
 
-theme_minimal
+#### theme_minimal
 
 ```{r}
 ggplot(data = exam_data, 
@@ -575,7 +575,7 @@ ggplot(data = exam_data,
   theme(plot.title = element_text(hjust = 0.5, color = "blue"))
 ```
 
-theme_bw
+#### theme_bw
 
 ```{r}
 ggplot(data = exam_data, 
@@ -587,7 +587,7 @@ ggplot(data = exam_data,
   theme(plot.title = element_text(hjust = 0.5, color = "blue"))
 ```
 
-## theme_classic
+#### theme_classic
 
 ```{r}
 ggplot(data = exam_data, 
