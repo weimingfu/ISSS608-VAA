@@ -1,0 +1,20 @@
+---
+title: "Hands-on Exercise 2 - Beyond ggplot2 Fundamentals"
+date: "January 14, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+---
+
+------------------------------------------------------------------------
+
+In this hands-on exercise, several ggplot2 extensions will be used for creating more elegant and effective statistical graphics. By the end of the exercise, you will be able to:
+
+-   control the placement of annotation on a graph by using functions provided in [ggrepel](https://ggrepel.slowkow.com/) package,
+-   create professional publication quality figure by using functions provided in [ggthemes](https://ggplot2.tidyverse.org/reference/ggtheme.html) and [hrbrthemes](https://cran.r-project.org/web/packages/hrbrthemes/index.html) packages,
+-   plot composite figure by combining ggplot2 graphs by using [patchwork](https://cran.r-project.org/web/packages/patchwork/index.html) package.
+
+# 1. Getting Started

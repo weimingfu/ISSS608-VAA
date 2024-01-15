@@ -1,15 +1,19 @@
 ---
-title: "ISSS608-VAA My Visual Analytics Journey" 
+title: "Set Sail into the Adventures of ISSS608-VAA"
+
+listing:
+  contents: "*.qmd"
+  type: grid
+  sort: "date desc"
+  max-items: 6
 ---
 
-Welcome to **ISSS608 Visual Analytics and Applications**. In this website, you will find my coursework prepared for this course.
+Welcome to **ISSS608 Visual Analytics and Applications**. In this website, you will find the "expeditions" which I have experienced for this course.
 
 > *“The greatest value of a picture is when it forces us to notice what we never expected to see.” -[John Tukey](http://www-history.mcs.st-and.ac.uk/Biographies/Tukey.html)*
 
-| [**My Visual Analytics Journey from**]{style="color: yellow"}
+![](images/picture1.jpeg){fig-align="center"}
 
-![](images/pexels-pixabay-210607.jpg){fig-align="center" width="556"}
+#  Latest Posts
 
-| [**To discovering the value of "pictures"**]{style="color: yellow"}
-
-![](images/graph-6249047_1280.png){fig-align="center" width="556"}
+------------------------------------------------------------------------
