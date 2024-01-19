@@ -594,8 +594,8 @@ p1 + p2
 ::: {style="color: white"}
 We can plot more complex composite by using appropriate operators. For example, the composite figure below is plotted by using:
 
--   “\|” operator to stack two ggplot2 graphs,
--   “/” operator to place the plots beside each other,
+-   “/” operator to stack two ggplot2 graphs,
+-   “\|” operator to place the plots beside each other,
 -   “()” operator the define the sequence of the plotting.
 :::
 

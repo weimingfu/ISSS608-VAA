@@ -3,3 +3,10 @@
 .navbar-logo {
   max-height: 60px;
 }
+
+.scrolling {
+  max-height: 600px;
+  overflow-y: scroll;
+}
+
+fontcolor: "white"

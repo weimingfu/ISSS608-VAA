@@ -43,6 +43,7 @@ format:
     code-overflow: wrap
     css: styles.css
     toc: true
+    fontcolor: "white"
 
 editor: visual
 
