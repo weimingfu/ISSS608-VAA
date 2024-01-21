@@ -174,7 +174,8 @@ Below code chunks are used to extract the variables that are required for furthe
 -   Estimate measure for student's performance
     -   Plausible values (PVs) for each of the three domains, i.e. MATHS, SCIENCE and READING, denoted by PV{N}{DOMAIN} where N is the nth plausible value for the DOMAIN.
 -   School
-    -   Whether school is public or independent.
+    -   SchoolID, denoted by CNTSCHID
+    -   Whether school is public or independent, denoted by STRATUM.
 -   Gender
     -   Female or Male, denoted by ST004D01T.
 -   Measure for socioeconomic status
@@ -305,7 +306,7 @@ sfu_qqq_SG_req["SCIE_level"] <- cut(sfu_qqq_SG_req$PVSCIE_final,
                                     breaks = c(0, 260.53999, 334.93999, 409.53999, 484.13999, 558.72999, 633.32999, 707.92999, 2000),
                                     labels = c("Below 1b", "Level 1b", "Level 1a", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6"))
 
-datatable(head(sfu_qqq_SG_req[c("CNTSTUID", "MATH_level", "READ_level", "PVSCIE_final")], 8),
+datatable(head(sfu_qqq_SG_req[c("CNTSTUID", "MATH_level", "READ_level", "SCIE_level")], 8),
           rownames = FALSE,
           options = list(dom = c("t")),
           style = "bootstrap",
@@ -460,7 +461,7 @@ school_bar | (school_box_math / school_box_read / school_box_scie)
 
 ## 4.1 Distribution of Singapore students’ performance in Math, Reading, and Science
 
-In this section, the raincloud plot is used to provide a visual overview of students' performances in the three domains. The raincloud plot is a data visualisation technique a half density to a distribution diagram, and thus is able to provide additional insights, such as the existence of multiple modalities, which could suggests the possibility of groups. Using the raincloud plot, we were able to come up with insights and hypothesis, which could be examined further using CDA techniques.
+In this section, the raincloud plot is used to provide a visual overview of students' performances in the three domains. The raincloud plot is a data visualisation technique that provides a half density distribution diagram, and thus is able to provide additional insights, such as the existence of multiple modalities, which could suggests the possibility of groups. Using the raincloud plot, we were able to come up with insights and hypothesis, which could be examined further using CDA techniques.
 
 Below are the code chunks for this data visualisation:
 
@@ -514,7 +515,7 @@ ggplot(all_scores,
 | Using the above plots, insights pertaining to the distribution of the performance of Singapore students were obtained:                                                                                                                                                                            |
 |                                                                                                                                                                                                                                                                                                   |
 | 1.  From the density plot, the peak frequencies for Math and Science occurs at higher scores as compared to Reading, suggesting that Singapore students' performed better in Maths and Science. This observation is also apparent from the boxplot, where the median scores for Reading is lower. |
-| 2.  From the inverted dot plot, it was observed that the distributions are quite similarly shaped for all 3 domains, though the number of students scoring better in Math and Science is higher, indicated by the higher number of dots.                                                          |
+| 2.  From the inverted dot plot, it was observed that the distributions are quite similarly shaped for all three domains, though the number of students scoring better in Math and Science is higher, indicated by the higher number of dots ay higher scores.                                     |
 | 3.  The outliers for all 3 domains occur at only the lower range, but as the numbers are not high, this may not be of concern.                                                                                                                                                                    |
 | 4.  The dot plot also suggests the possibility of multiple modalities in the distributions of Reading and Science scores, which might influence the choice of subsequent analyses.                                                                                                                |
 +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -782,15 +783,15 @@ ggbetweenstats(data = sfu_qqq_SG_req,
 The p-value obtained from the 2-sample non-parrametric test is lower than significance level of 0.05, thus **rejecting the null hypothesis** that there is no difference in Science performance between genders. Specifically, Male students had a higher median than Female students, suggesting that Male students had performed better in Science.
 :::
 
-+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| DISCUSSIONS & INSIGHTS                                                                                                                                                                                                                                                                                                                                                                                                             |
-+====================================================================================================================================================================================================================================================================================================================================================================================================================================+
-| Using the above plots, differences in the distribution across both gender groups can be observed. The insights are:                                                                                                                                                                                                                                                                                                                |
-|                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| 1.  The range in performances between the two genders are similar when compared within the same domain. However, across the domains, both genders had density distribution with longer upper tails for Math, while having longer lower tails for Reading. This suggests that both genders likely performed better in Math than Reading.                                                                                            |
-| 2.  In terms of the peak frequency in the density distribution, Male students recorded peak frequencies at higher performance for both Math and Science, while having similar performance compared to Females for Reading. This suggests that a higher proportion of Male students performed better for Math and Science, though this needs to be confirmed by CDA techniques as the ridges for the Male students are skewed left. |
-| 3.  The follow-on non-parametric 2-sample tests confirmed the rejection of the null hypothesis, and suggests that there are differences in performance between the 2 genders.                                                                                                                                                                                                                                                      |
-+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| DISCUSSIONS & INSIGHTS                                                                                                                                                                                                                                                                                                                                                                                                      |
++=============================================================================================================================================================================================================================================================================================================================================================================================================================+
+| Using the above plots, differences in the distribution across both gender groups can be observed. The insights are:                                                                                                                                                                                                                                                                                                         |
+|                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 1.  The range in performances between the two genders are similar when compared within the same domain. However, across the domains, both genders had density distribution with longer upper tails for Math, while having longer lower tails for Reading. This suggests that both genders likely performed better in Math than Reading.                                                                                     |
+| 2.  In terms of the peak frequency in the density distribution, Male students recorded peak frequencies at higher scores for both Math and Science, while being at a similar score compared to Females for Reading. This suggests that a higher proportion of Male students performed better for Math and Science, though this needs to be confirmed by CDA techniques as the ridges for the Male students are skewed left. |
+| 3.  The follow-on non-parametric 2-sample tests confirmed the rejection of the null hypothesis, and suggests that there are differences in performance between the 2 genders.                                                                                                                                                                                                                                               |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ## 4.3 Public schools seem to exhibit higher disparity in performance
 
@@ -926,7 +927,7 @@ scie_hist_1 <- ggplot(data = new_df,
 fig3 <- (math_ridge_2 / read_ridge_2 / scie_ridge_2) | (math_hist_1 / read_hist_1 / scie_hist_1)
 
 fig3 +
-  plot_annotation(title = "Do all schools perform equally well?", subtitle = "Private schools have an edge over Public schools")
+  plot_annotation(title = "Do all schools perform equally well?", subtitle = "Private schools appear to have an edge over Public schools")
 ```
 
 ## Normality test
@@ -1057,7 +1058,7 @@ ggbetweenstats(data = sfu_qqq_SG_req,
   theme(legend.position = "none")
 ```
 
-The p-value obtained from the 2-sample t-test is lower than significance level of 0.05, thus *rejecting the null hypothesis* that there is no difference in Math performance between school categories. Specifically, private school students had a higher mean than public school students, suggesting that private school students had performed better in Math.
+The p-value obtained from the 2-sample t-test is lower than significance level of 0.05, thus **rejecting the null hypothesis** that there is no difference in Math performance between school categories. Specifically, private school students had a higher mean than public school students, suggesting that private school students had performed better in Math.
 
 Hypothesis 2:
 
@@ -1082,7 +1083,7 @@ ggbetweenstats(data = sfu_qqq_SG_req,
 
 ```
 
-The p-value obtained from the 2-sample non-parametric test is lower than significance level of 0.05, thus *rejecting the null hypothesis* that there is no difference in Reading performance between school categories. Specifically, private school students had a higher median than public school students, suggesting that private school students had performed better in Reading.
+The p-value obtained from the 2-sample non-parametric test is lower than significance level of 0.05, thus **rejecting the null hypothesis** that there is no difference in Reading performance between school categories. Specifically, private school students had a higher median than public school students, suggesting that private school students had performed better in Reading.
 
 Hypothesis 3:
 
@@ -1107,23 +1108,23 @@ ggbetweenstats(data = sfu_qqq_SG_req,
 
 ```
 
-The p-value obtained from the 2-sample non-parametric test is lower than significance level of 0.05, thus *rejecting the null hypothesis* that there is no difference in Science performance between school categories. Specifically, private school students had a higher median than public school students, suggesting that private school students had performed better in Science.
+The p-value obtained from the 2-sample non-parametric test is lower than significance level of 0.05, thus **rejecting the null hypothesis** that there is no difference in Science performance between school categories. Specifically, private school students had a higher median than public school students, suggesting that private school students had performed better in Science.
 :::
 
-+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| DISCUSSIONS & INSIGHTS                                                                                                                                                                                                                                                                     |
-+============================================================================================================================================================================================================================================================================================+
-| Using the above plots, differences in the distributions across school categories were analysed. The insights are:                                                                                                                                                                          |
-|                                                                                                                                                                                                                                                                                            |
-| 1.  The density ridges for private schools generally has steeper slopes as compared to public schools. From this, we can infer that the differences in performance of public schools varies more, i.e. public schools' performance are less "equal" than that of private schools.          |
-| 2.  In terms of the peak frequency in the density distribution, private school students recorded peak frequencies at higher performance for Math, at lower performance for Reading and at similar performance for Science. Subsequent CDA techniques was used to confirm the observations. |
-| 3.  From the histogram plots, it was also observed that the range of school average scores is smaller in private schools than in public schools, suggesting that performance among private schools could be more consistent.                                                               |
-| 4.  The follow-on 2-sample tests confirmed the rejection of the null hypothesis, and suggests that private school students had better performance, contrary to what EDA had initially suggested.                                                                                           |
-+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| DISCUSSIONS & INSIGHTS                                                                                                                                                                                                                                                            |
++===================================================================================================================================================================================================================================================================================+
+| Using the above plots, differences in the distributions across school categories were analysed. The insights are:                                                                                                                                                                 |
+|                                                                                                                                                                                                                                                                                   |
+| 1.  The density ridges for private schools generally has steeper slopes as compared to public schools. From this, we can infer that the differences in performance of public schools varies more, i.e. public schools' performance are less "equal" than that of private schools. |
+| 2.  In terms of the peak frequency in the density distribution, private school students recorded peak frequencies at lower score for Math, at higher score for Reading and at similar score for Science. Subsequent CDA techniques was used to confirm the observations.          |
+| 3.  From the histogram plots, it was also observed that the range of school average scores is smaller in private schools than in public schools, suggesting that performance among private schools could be more consistent.                                                      |
+| 4.  The follow-on 2-sample tests confirmed the rejection of the null hypothesis, and suggests that private school students had better performance in all three domains, contrary to what EDA had initially suggested.                                                             |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ## 4.4 Positive correlation between performance and socioeconomic status
 
-Next, we use scatter plots to visualise any correlations between the performance proxy, i.e. the average Plausible Value for each domain, and the socioeconomic status (measured by ESCS index by OECD PISA), so as to see if any hypothesis or insights on possible relationship between socioeconomic status and performance can be derived.
+Next, we use scatter plots to visualise correlations between the performance proxy, i.e. the average Plausible Value for each domain, and the socioeconomic status (measured by ESCS index by OECD PISA), so as to see if any hypothesis or insights on possible relationship between socioeconomic status and performance can be derived.
 
 Below are the code chunks for the data visualisation.
 
@@ -1213,7 +1214,7 @@ fig4 <- math_scatter | read_scatter | scie_scatter
 
 fig4 +
   plot_annotation(title = "Student performance increases with socioeconomic status",
-                  subtitle = "Performance for all domains are positively correlated with socioeconomic status, \nindicating that family's financial ability affects student's performance")
+                  subtitle = "Performance for all domains are positively correlated with socioeconomic status, \nindicating that family's financial ability likely affects student's performance")
 ```
 
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -1432,7 +1433,7 @@ fig5 +
 -   the distribution of Singapore students’ performance in mathematics, reading, and science, and
 -   the relationship between these performances with schools, gender and socioeconomic status of the students.
 
-From the exploratory analysis one, key insights obtained are as follows:
+From the exploratory analysis done, key insights obtained are as follows:
 
 -   There is likelihood that performance differs between genders, where Male students likely perform better in Maths and Science,
 -   Not all schools have performed equally well, with the likelihood that private schools having performed better than public schools,
