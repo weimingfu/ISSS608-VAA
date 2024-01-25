@@ -21,6 +21,14 @@ website:
           href: "Hands-on_Ex/Hands-on_Ex03a/Hands-on_Ex03a.html"
         - text: "Hands-on Exercise 3b"
           href: "Hands-on_Ex/Hands-on_Ex03b/Hands-on_Ex03b.html"
+        - text: "Hands-on Exercise 4a"
+          href: "Hands-on_Ex/Hands-on_Ex04a/Hands-on_Ex04a.html"
+        - text: "Hands-on Exercise 4b"
+          href: "Hands-on_Ex/Hands-on_Ex04b/Hands-on_Ex04b.html"
+        - text: "Hands-on Exercise 4c"
+          href: "Hands-on_Ex/Hands-on_Ex04c/Hands-on_Ex04c.html"
+        - text: "Hands-on Exercise 4d"
+          href: "Hands-on_Ex/Hands-on_Ex04d/Hands-on_Ex04d.html"
       - text: "In-class Exercise"
         menu:
         - text: "In-class Exercise 1"
@@ -47,11 +55,11 @@ website:
 format:
   html:
     theme: 
-      light: solar
+      light: sandstone
     code-overflow: wrap
     css: styles.css
     toc: true
-    fontcolor: "white"
+    fontcolor: "grey"
 
 editor: visual
 

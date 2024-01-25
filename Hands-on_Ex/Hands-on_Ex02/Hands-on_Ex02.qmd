@@ -21,9 +21,9 @@ In this hands-on exercise, several ggplot2 extensions will be used for creating 
 
 ![](/images/unnamed-chunk-29-1.png){fig-align="center"}
 
-## 1. Getting Started {style="color: yellow"}
+## 1. Getting Started
 
-### 1.1 **Installing and loading the required libraries** {style="color: white"}
+### 1.1 **Installing and loading the required libraries**
 
 In this hands-on exercise, besides tidyverse, four R packages will be used. They are:
 
@@ -38,7 +38,7 @@ Code chunk below will be used to check if these packages have been installed and
 pacman::p_load(ggrepel, patchwork, ggthemes, hrbrthemes, tidyverse)
 ```
 
-### 1.2 **Importing data** {style="color: white"}
+### 1.2 **Importing data**
 
 For the purpose of this exercise, a data file called *Exam_data* will be used. It consists of year end examination grades of a cohort of primary 3 students from a local school. It is in csv file format.
 
@@ -57,11 +57,13 @@ There are a total of seven attributes in the exam_data tibble data frame. Four o
 -   The categorical attributes are: ID, CLASS, GENDER and RACE.
 -   The continuous attributes are: MATHS, ENGLISH and SCIENCE.
 
-## **2. Beyond ggplot2 Annotation: ggrepel** {style="color: yellow"}
+## **2. Beyond ggplot2 Annotation: ggrepel**
 
-::: {style="color: white"}
+<div>
+
 One of the challenge in plotting statistical graph is annotation, especially with large number of data points.
-:::
+
+</div>
 
 ::: panel-tabset
 #### The plot
@@ -106,17 +108,21 @@ ggplot(data=exam_data,
 ```
 :::
 
-::: {style="color: white"}
+<div>
+
 [**ggrepel**](https://ggrepel.slowkow.com/) ![](https://r4va.netlify.app/chap02/img/image3.jpg){width="27" height="30"} is an extension of **ggplot2** package which provides `geoms` for **ggplot2** to repel overlapping text as in our examples on the right.
-:::
+
+</div>
 
 ![](images/clipboard-770943917.png){fig-align="center"}
 
-::: {style="color: white"}
-We simply replace `geom_text()` by [`geom_text_repel()`](https://ggrepel.slowkow.com/reference/geom_text_repel.html) and `geom_label()` by [`geom_label_repel`](https://ggrepel.slowkow.com/reference/geom_text_repel.html).
-:::
+<div>
 
-### **2.1 Working with ggrepel** {style="color: white"}
+We simply replace `geom_text()` by [`geom_text_repel()`](https://ggrepel.slowkow.com/reference/geom_text_repel.html) and `geom_label()` by [`geom_label_repel`](https://ggrepel.slowkow.com/reference/geom_text_repel.html).
+
+</div>
+
+### **2.1 Working with ggrepel**
 
 ::: panel-tabset
 #### The plot
@@ -158,11 +164,13 @@ ggplot(data=exam_data,
 ```
 :::
 
-## **3. Beyond ggplot2 Themes** {style="color: yellow"}
+## **3. Beyond ggplot2 Themes**
 
-::: {style="color: white"}
+<div>
+
 ggplot2 comes with eight [built-in themes](https://ggplot2.tidyverse.org/reference/ggtheme.html), they are: `theme_gray()`, `theme_bw()`, `theme_classic()`, `theme_dark()`, `theme_light()`, `theme_linedraw()`, `theme_minimal()`, and `theme_void()`.
-:::
+
+</div>
 
 ::: panel-tabset
 #### The plot
@@ -198,11 +206,13 @@ ggplot(data=exam_data,
 ```
 :::
 
-::: {style="color: white"}
-Refer to this [link](https://ggplot2.tidyverse.org/reference/#themes) to learn more about ggplot2 `Themes`
-:::
+<div>
 
-### **3.1 Working with ggtheme package** {style="color: white"}
+Refer to this [link](https://ggplot2.tidyverse.org/reference/#themes) to learn more about ggplot2 `Themes`
+
+</div>
+
+### **3.1 Working with ggtheme package**
 
 [**ggthemes**](https://cran.r-project.org/web/packages/ggthemes/) provides [‘ggplot2’ themes](https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/) that replicate the look of plots by Edward Tufte, Stephen Few, [Fivethirtyeight](https://fivethirtyeight.com/), [The Economist](https://www.economist.com/graphic-detail), ‘Stata’, ‘Excel’, and [The Wall Street Journal](https://www.pinterest.com/wsjgraphics/wsj-graphics/), among others.
 
@@ -350,15 +360,19 @@ ggplot(data=exam_data,
 :::
 :::
 
-::: {style="color: white"}
+<div>
+
 It also provides some extra geoms and scales for ‘ggplot2’. Consult [this vignette](https://mran.microsoft.com/snapshot/2016-12-28/web/packages/ggthemes/vignettes/ggthemes.html) to learn more.
-:::
 
-### **3.2 Working with hrbthems package** {style="color: white"}
+</div>
 
-::: {style="color: white"}
+### **3.2 Working with hrbthems package**
+
+<div>
+
 [**hrbrthemes**](https://cinc.rud.is/web/packages/hrbrthemes/) package provides a base theme that focuses on typographic elements, including where various labels are placed as well as the fonts that are used.
-:::
+
+</div>
 
 ::: panel-tabset
 #### The plot
@@ -393,9 +407,11 @@ ggplot(data=exam_data,
 ```
 :::
 
-::: {style="color: white"}
+<div>
+
 The second goal centers around productivity for a production workflow. In fact, this “production workflow” is the context for where the elements of hrbrthemes should be used. Consult [this vignette](https://cran.r-project.org/web/packages/hrbrthemes/vignettes/why_hrbrthemes.html) to learn more.
-:::
+
+</div>
 
 ::: panel-tabset
 ##### The plot
@@ -435,20 +451,24 @@ ggplot(data=exam_data,
 :::
 
 ::: callout-note
-::: {style="color: lightyellow"}
+<div>
+
 **What can we learn from the code chunk above?**
 
 -   `axis_title_size` argument is used to increase the font size of the axis title to 18,
 -   `base_size` argument is used to increase the default axis label to 15, and
 -   `grid` argument is used to remove the x-axis grid lines.
-:::
+
+</div>
 :::
 
-## **4 Beyond Single Graph** {style="color: yellow"}
+## **4 Beyond Single Graph**
 
-::: {style="color: white"}
+<div>
+
 It is not unusual that multiple graphs are required to tell a compelling visual story. There are several ggplot2 extensions provide functions to compose figure with multiple graphs. In this section, you will learn how to create composite plot by combining multiple graphs. First, let us create three statistical graphics by using the code chunks below.
-:::
+
+</div>
 
 ::: panel-tabset
 #### Maths scores
@@ -553,9 +573,10 @@ p3 <- ggplot(data=exam_data,
 :::
 :::
 
-### **4.1 Creating Composite Graphics: pathwork methods** ![](https://r4va.netlify.app/chap02/img/image4.png){width="32" height="38"} {style="color: white"}
+### **4.1 Creating Composite Graphics: pathwork methods** ![](https://r4va.netlify.app/chap02/img/image4.png){width="32" height="38"}
 
-::: {style="color: white"}
+<div>
+
 There are several ggplot2 extension’s functions support the needs to prepare composite figure by combining several graphs such as [`grid.arrange()`](https://cran.r-project.org/web/packages/gridExtra/vignettes/arrangeGrob.html) of **gridExtra** package and [`plot_grid()`](https://wilkelab.org/cowplot/reference/plot_grid.html) of [**cowplot**](https://wilkelab.org/cowplot/) package. In this section, I am going to shared with you an ggplot2 extension called [**patchwork**](https://patchwork.data-imaginist.com/) which is specially designed for combining separate ggplot2 graphs into a single figure.
 
 Patchwork package has a very simple syntax where we can create layouts super easily. Here’s the general syntax that combines:
@@ -563,13 +584,16 @@ Patchwork package has a very simple syntax where we can create layouts super eas
 -   Two-Column Layout using the Plus Sign +.
 -   Parenthesis () to create a subplot group.
 -   Two-Row Layout using the Division Sign `/`
-:::
 
-### **4.2 Combining two ggplot2 graphs** {style="color: white"}
+</div>
 
-::: {style="color: white"}
+### **4.2 Combining two ggplot2 graphs**
+
+<div>
+
 Figure in the tabset below shows a composite of two histograms created using patchwork. Note how simple the syntax used to create the plot!
-:::
+
+</div>
 
 ::: panel-tabset
 #### The plot
@@ -589,15 +613,17 @@ p1 + p2
 ```
 :::
 
-### **4.3 Combining three ggplot2 graphs** {style="color: white"}
+### **4.3 Combining three ggplot2 graphs**
 
-::: {style="color: white"}
+<div>
+
 We can plot more complex composite by using appropriate operators. For example, the composite figure below is plotted by using:
 
 -   “/” operator to stack two ggplot2 graphs,
 -   “\|” operator to place the plots beside each other,
 -   “()” operator the define the sequence of the plotting.
-:::
+
+</div>
 
 ::: panel-tabset
 #### The plot
@@ -617,15 +643,19 @@ We can plot more complex composite by using appropriate operators. For example, 
 ```
 :::
 
-::: {style="color: white"}
+<div>
+
 To learn more about, refer to [Plot Assembly](https://patchwork.data-imaginist.com/articles/guides/assembly.html).
-:::
 
-### **4.4 Creating a composite figure with tag** {style="color: white"}
+</div>
 
-::: {style="color: white"}
+### **4.4 Creating a composite figure with tag**
+
+<div>
+
 In order to identify subplots in text, **patchwork** also provides auto-tagging capabilities as shown in the figure below.
-:::
+
+</div>
 
 ::: panel-tabset
 #### The plot
@@ -647,11 +677,13 @@ In order to identify subplots in text, **patchwork** also provides auto-taggin
 ```
 :::
 
-### 4.5 **Creating figure with insert** {style="color: white"}
+### 4.5 **Creating figure with insert**
 
-::: {style="color: white"}
+<div>
+
 Beside providing functions to place plots next to each other based on the provided layout. With [`inset_element()`](https://patchwork.data-imaginist.com/reference/inset_element.html) of **patchwork**, we can place one or several plots or graphic elements freely on top or below another plot.
-:::
+
+</div>
 
 ::: panel-tabset
 #### The plot
@@ -680,7 +712,7 @@ p3 + inset_element(p2,
 ```
 :::
 
-### **4.6 Creating a composite figure by using patchwork and ggtheme** {style="color: white"}
+### **4.6 Creating a composite figure by using patchwork and ggtheme**
 
 Figure below is created by combining patchwork and theme_economist() of ggthemes package discussed earlier.
 

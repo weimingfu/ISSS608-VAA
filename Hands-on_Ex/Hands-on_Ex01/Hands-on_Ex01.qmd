@@ -15,9 +15,9 @@ In this chapter, you will learn the basic principles and essential components of
 
 ![](/images/image5.png){fig-align="center"}
 
-## 1. Getting Started {style="color: yellow"}
+## 1. Getting Started
 
-### 1.1 Install and launching R packages {style="color: white"}
+### 1.1 Install and launching R packages
 
 *The code chunk below uses p_load() of [**pacman**](https://cran.r-project.org/web/packages/pacman/)* *package to check if tidyverse packages are installed in the computer. If they are, then they will be launched into R.*
 
@@ -25,7 +25,7 @@ In this chapter, you will learn the basic principles and essential components of
 pacman::p_load(tidyverse)
 ```
 
-### 1.2 Importing the data {style="color: white"}
+### 1.2 Importing the data
 
 The code chunk below imports *exam_data.csv* into R environment by using [*read_csv()*](https://readr.tidyverse.org/reference/read_delim.html) function of [**readr**](https://readr.tidyverse.org/) package.
 
@@ -39,7 +39,7 @@ Summary of data imported
 summary(exam_data)
 ```
 
-## 2. Plotting a simple bar chart {style="color: yellow"}
+## 2. Plotting a simple bar chart
 
 ```{r}
 ggplot(data = exam_data, 
@@ -50,9 +50,9 @@ ggplot(data = exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-## 3. Initial Exploration of ggplot2 {style="color: yellow"}
+## 3. Initial Exploration of ggplot2
 
-### 3.1 Exploring Base R vs ggplot2 {style="color: white"}
+### 3.1 Exploring Base R vs ggplot2
 
 ::: panel-tabset
 #### Base R
@@ -73,9 +73,10 @@ ggplot(data=exam_data, aes(x = MATHS)) +
 ```
 :::
 
-## **4. Grammar of Graphics** {style="color: yellow"}
+## **4. Grammar of Graphics**
 
-::: {style="color: white"}
+<div>
+
 Before we getting started using ggplot2, it is important for us to understand the principles of Grammer of Graphics.
 
 Grammar of Graphics is a general scheme for data visualization which breaks up graphs into semantic components such as scales and layers. It was introduced by Leland Wilkinson (1999) **Grammar of Graphics**, Springer. The grammar of graphics is an answer to a question:
@@ -93,11 +94,13 @@ There are two principles in Grammar of Graphics, they are:
 A good grammar of graphics will allow us to gain insight into the composition of complicated graphics, and reveal unexpected connections between seemingly different graphics (Cox 1978). It also provides a strong foundation for understanding a diverse range of graphics. Furthermore, it may also help guide us on what a well-formed or correct graphic looks like, but there will still be many grammatically correct but nonsensical graphics.
 
 ggplot2 is an implementation of Leland Wilkinson’s Grammar of Graphics. Figure below shows the seven grammars of ggplot2.
-:::
+
+</div>
 
 ![Reference: Hadley Wickham (2010) “[A layered grammar of graphics](https://vita.had.co.nz/papers/layered-grammar.html).” Journal of Computational and Graphical Statistics, vol. 19, no. 1, pp. 3–28.](/images/image4.jpg){fig-align="center"}
 
-::: {style="color: white"}
+<div>
+
 A short description of each building block are as follows:
 
 -   **Data**: The dataset being plotted.
@@ -113,11 +116,13 @@ A short description of each building block are as follows:
 -   **Coordinate systems** define the plane on which data are mapped on the graphic.
 
 -   **Themes** modify all non-data components of a plot, such as main title, sub-title, y-aixs title, or legend background.
-:::
 
-## **5. Essential Grammatical Elements in ggplot2: data** {style="color: yellow"}
+</div>
 
-::: {style="color: white"}
+## **5. Essential Grammatical Elements in ggplot2: data**
+
+<div>
+
 Call the `ggplot()` function using the code chunk below.
 
 -   A blank canvas appears.
@@ -127,30 +132,34 @@ Call the `ggplot()` function using the code chunk below.
 -   The *data* argument defines the dataset to be used for plotting.
 
 -   If the dataset is not already a data.frame, it will be converted to one by `fortify()`.
-:::
+
+</div>
 
 ```{r}
 ggplot(data=exam_data)
 ```
 
-## **6. Essential Grammatical Elements in ggplot2: [Aesthetic mappings](https://ggplot2.tidyverse.org/articles/ggplot2-specs.html)** {style="color: yellow"}
+## **6. Essential Grammatical Elements in ggplot2: [Aesthetic mappings](https://ggplot2.tidyverse.org/articles/ggplot2-specs.html)**
 
-::: {style="color: white"}
+<div>
+
 The aesthetic mappings take attributes of the data and and use them to influence visual characteristics, such as position, colour, size, shape, or transparency. Each visual characteristic can thus encode an aspect of the data and be used to convey information.
 
 All aesthetics of a plot are specified in the [`aes()`](https://ggplot2.tidyverse.org/reference/aes.html) function call (in later part of this lesson, you will see that each *geom* layer can have its own aes specification)
 
 Code chunk below adds the aesthetic element into the plot.
-:::
+
+</div>
 
 ```{r}
 ggplot(data=exam_data, 
        aes(x= MATHS))
 ```
 
-## 7. **Essential Grammatical Elements in ggplot2: geom** {style="color: yellow"}
+## 7. **Essential Grammatical Elements in ggplot2: geom**
 
-::: {style="color: white"}
+<div>
+
 The geom layer combines data, aesthetic mapping, a geom (geometric object), a stat (statistical transformation), and a position adjustment. Some examples of geom objects are shown below.
 
 Examples include:
@@ -172,11 +181,12 @@ Examples include:
 A plot must have at least one geom; there is no upper limit. You can add a geom to a plot using the **+** operator.
 
 -   For complete list, please refer to [here](https://ggplot2.tidyverse.org/reference/#section-layer-geoms).
-:::
+
+</div>
 
 ![](images/image6.jpg){width="675"}
 
-### 7.1 Bar Chart {style="color: white"}
+### 7.1 Bar Chart
 
 The code chunk below plots a bar chart by using [`geom_bar()`](https://ggplot2.tidyverse.org/reference/geom_bar.html).
 
@@ -190,7 +200,7 @@ ggplot(data=exam_data,
   
 ```
 
-### 7.2 Dot Plot {style="color: white"}
+### 7.2 Dot Plot
 
 In a dot plot, the width of a dot corresponds to the bin width (or maximum width, depending on the binning algorithm), and dots are stacked, with each dot representing one observation.
 
@@ -207,7 +217,7 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 7.3 Histogram Plot {style="color: white"}
+### 7.3 Histogram Plot
 
 In the code chunk below, [*geom_histogram()*](https://ggplot2.tidyverse.org/reference/geom_histogram.html) is used to create a simple histogram by using values in *MATHS* field of *exam_data*.
 
@@ -222,7 +232,7 @@ ggplot(data=exam_data, aes(x = MATHS)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 7.4 Modifying a geometric object by changing aes() - Stacked Histogram {style="color: white"}
+### 7.4 Modifying a geometric object by changing aes() - Stacked Histogram
 
 In the code chunk below,
 
@@ -243,7 +253,7 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 7.5 Density Plot {style="color: white"}
+### 7.5 Density Plot
 
 [`geom-density()`](https://ggplot2.tidyverse.org/reference/geom_density.html) computes and plots [kernel density estimate](https://en.wikipedia.org/wiki/Kernel_density_estimation), which is a smoothed version of the histogram.
 
@@ -260,7 +270,7 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 7.6 Box Plot {style="color: white"}
+### 7.6 Box Plot
 
 [`geom_boxplot()`](https://ggplot2.tidyverse.org/reference/geom_boxplot.html) displays continuous value list. It visualises five summary statistics (the median, two hinges and two whiskers), and all “outlying” points individually.
 
@@ -298,7 +308,7 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 7.7 Violin Plot {style="color: white"}
+### 7.7 Violin Plot
 
 [`geom_violin`](https://ggplot2.tidyverse.org/reference/geom_violin.html) is designed for creating violin plot. Violin plots are a way of comparing multiple data distributions. With ordinary density curves, it is difficult to compare more than just a few distributions because the lines visually interfere with each other. With a violin plot, it’s easier to compare several distributions since they’re placed side by side.
 
@@ -314,7 +324,7 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 7.8 Scatter Plot {style="color: white"}
+### 7.8 Scatter Plot
 
 [`geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html) is especially useful for creating scatterplot.
 
@@ -331,7 +341,7 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 7.9 Combining Box Plot and Scatter Plot {style="color: white"}
+### 7.9 Combining Box Plot and Scatter Plot
 
 The code chunk below plots the data points on the boxplots by using both `geom_boxplot()` and `geom_point()`.
 
@@ -347,7 +357,7 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 7.10 Exploring Statistics functions {style="color: white"}
+### 7.10 Exploring Statistics functions
 
 The [Statistics functions](https://ggplot2.tidyverse.org/reference/#stats) statistically transform data, usually as some form of summary. For example:
 
@@ -399,7 +409,7 @@ ggplot(data=exam_data,
 
 ```
 
-### 7.11 Adding best fit curve on Scatter Plot {style="color: white"}
+### 7.11 Adding best fit curve on Scatter Plot
 
 The scatterplot below shows the relationship of Maths and English grades of pupils. The interpretability of this graph can be improved by adding a best fit curve.
 
@@ -420,13 +430,15 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-## 8. Exploring ggplot2 Facet objects {style="color: yellow"}
+## 8. Exploring ggplot2 Facet objects
 
-::: {style="color: white"}
+<div>
+
 Facetting generates small multiples (sometimes also called trellis plot), each displaying a different subset of the data. They are an alternative to aesthetics for displaying additional discrete variables. ggplot2 supports two types of factes, namely: [`facet_grid()`](https://ggplot2.tidyverse.org/reference/facet_grid.html) and [`facet_wrap`](https://ggplot2.tidyverse.org/reference/facet_wrap.html).
-:::
 
-### 8.1 Using facet_wrap() {style="color: white"}
+</div>
+
+### 8.1 Using facet_wrap()
 
 [`facet_wrap`](https://ggplot2.tidyverse.org/reference/facet_wrap.html) wraps a 1d sequence of panels into 2d. This is generally a better use of screen space than facet_grid because most displays are roughly rectangular.
 
@@ -442,7 +454,7 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 8.2 Using facet_grid() {style="color: white"}
+### 8.2 Using facet_grid()
 
 [`facet_grid()`](https://ggplot2.tidyverse.org/reference/facet_grid.html) forms a matrix of panels defined by row and column facetting variables. It is most useful when you have two discrete variables, and all combinations of the variables exist in the data.
 
@@ -458,7 +470,7 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 8.3 Creating Trellis Box Plot {style="color: white"}
+### 8.3 Creating Trellis Box Plot
 
 Self-practice: Below code chunks shows the use of geom_boxplot() with facet_wrap() to produce a Trellis Box Plot.
 
@@ -484,20 +496,22 @@ ggplot(data = exam_data,
   theme(plot.title = element_text(hjust=0.5))
 ```
 
-## 9. Exploring ggplot2 Coordinates {style="color: yellow"}
+## 9. Exploring ggplot2 Coordinates
 
-::: {style="color: white"}
+<div>
+
 The *Coordinates* functions map the position of objects onto the plane of the plot. There are a number of different possible coordinate systems to use, they are:
-:::
 
-``` {style="color: white"}
+</div>
+
+```         
 -   [`coord_cartesian()`](https://ggplot2.tidyverse.org/reference/coord_cartesian.html): the default cartesian coordinate systems, where you specify x and y values (e.g. allows you to zoom in or out). 
 -   [`coord_flip()`](https://ggplot2.tidyverse.org/reference/coord_flip.html): a cartesian system with the x and y flipped. 
 -   [`coord_fixed()`](https://ggplot2.tidyverse.org/reference/coord_fixed.html): a cartesian system with a "fixed" aspect ratio (e.g. 1.78 for a "widescreen" plot). 
 -   [`coord_quickmap()`](https://ggplot2.tidyverse.org/reference/coord_map.html): a coordinate system that approximates a good aspect ratio for maps.
 ```
 
-### 9.1 Horizontal Bar Chart using coord_flip() {style="color: white"}
+### 9.1 Horizontal Bar Chart using coord_flip()
 
 The code chunk below flips the horizontal bar chart into vertical bar chart by using `coord_flip()`.
 
@@ -511,7 +525,7 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 9.2 Changing y- and x- axes range {style="color: white"}
+### 9.2 Changing y- and x- axes range
 
 The code chunk below fixed both the y-axis and x-axis range from 0-100.
 
@@ -530,9 +544,10 @@ ggplot(data=exam_data,
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-## 10. Exploring ggplot2 Themes {style="color: yellow"}
+## 10. Exploring ggplot2 Themes
 
-::: {style="color: white"}
+<div>
+
 Themes control elements of the graph not related to the data. For example:
 
 -   background colour
@@ -546,9 +561,10 @@ Themes control elements of the graph not related to the data. For example:
 Built-in themes include: - `theme_gray()` (default) - `theme_bw()` - `theme_classic()`
 
 A list of theme can be found at this [link](https://ggplot2.tidyverse.org/reference/ggtheme.html). Each theme element can be conceived of as either a line (e.g. x-axis), a rectangle (e.g. graph background), or text (e.g. axis title).
-:::
 
-### 10.1 Working with themes {style="color: white"}
+</div>
+
+### 10.1 Working with themes
 
 ::: panel-tabset
 #### theme_gray
@@ -600,9 +616,10 @@ ggplot(data = exam_data,
 ```
 :::
 
-## **11. Reference** {style="color: yellow"}
+## **11. Reference**
 
-::: {style="color: white"}
+<div>
+
 -   Hadley Wickham (2023) [**ggplot2: Elegant Graphics for Data Analysis**](https://ggplot2-book.org/). Online 3rd edition.
 
 -   Winston Chang (2013) [**R Graphics Cookbook 2nd edition**](https://r-graphics.org/). Online version.
@@ -614,4 +631,5 @@ ggplot(data = exam_data,
 -   [Learning ggplot2 on Paper – Layer](https://henrywang.nl/learning-ggplot2-on-paper-layer/)
 
 -   [Learning ggplot2 on Paper – Scale](https://henrywang.nl/tag/learning-ggplot2-on-paper/)
-:::
+
+</div>
