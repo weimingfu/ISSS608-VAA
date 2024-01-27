@@ -1,0 +1,516 @@
+---
+title: "DataViz Makeover of Take-Home Exercise 1"
+subtitle: "Take-home Exercise 2"
+date: "January 27, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+format:
+  html:
+    code-fold: true
+    code-tools:
+      source: false
+---
+
+# 1 Overview
+
+------------------------------------------------------------------------
+
+In this take-home exercise, a Take-home Exercise 1 submission ([original submission here](https://kbuathang-isss608-vaa.netlify.app/take-home_ex/take-home_ex1/take-home_ex1)) prepared by my classmate in ISSS608 AY 2023-24 Jan Term, was chosen for DataViz makeover. The submission was assessed in terms of both clarity and aesthetics, and a sketch of an alternative DataViz design was prepared using data visualisation design principles and best practices learnt in first 2 lessons. The alternative design was next implemented using R ggplot2, ggplot2 extensions and tidyverse packages.
+
+# 2 Getting started
+
+------------------------------------------------------------------------
+
+## 2.1 Loading R packages
+
+The `pacman::p_load()` function is used to install and load the required R packages into the R environment, as below.
+
+```{r}
+pacman::p_load(tidyverse, haven, ggrepel, patchwork, ggplot2, 
+               ggthemes, hrbrthemes, dplyr, tidyr, knitr, ggridges, ggdist, ggstance)
+```
+
+Compared to the original submission, these 2 additional package were loaded:
+
+-   [ggdist](https://cran.r-project.org/web/packages/ggdist/): an R package that provides a flexible set of ggplot2 geoms and stats for visualising distributions and uncertainties
+-   [ggstance](https://exts.ggplot2.tidyverse.org/ggstance.html): an R paclage that extends ggplot2 and provides the horizontal versions of ggplot2 geoms
+
+## 2.2 **Importing PISA data**
+
+To reproduce the steps used in the original submission in preparing the dataset, the following code chunk uses the [`read_sas()`](https://haven.tidyverse.org/reference/read_sas.html) of [haven](https://haven.tidyverse.org/) to import PISA data into R environment.
+
+```{r}
+#| eval: false
+
+stu_qqq <- read_sas("data/cy08msp_stu_qqq.sas7bdat")
+```
+
+Filtering the entire data file for records belonging to Singapore students.
+
+```{r}
+#| eval: false
+stu_qqq_SG <- stu_qqq %>%
+  filter(CNT == "SGP")
+```
+
+Saving the records belonging to Singapore students into “stu_qqq_SG.rds” file for easier loading (no need to extract the records from the entire dataset repeatedly).
+
+```{r}
+#| eval: false
+write_rds(stu_qqq_SG,
+          "data/stu_qqq_SG.rds")
+```
+
+Loading the extract records from the saved “stu_qqq_SG.rds” file.
+
+```{r}
+sfu_qqq_SG <- read_rds("data/stu_qqq_SG.rds")
+```
+
+Following code chunk uses [`select()`](https://dplyr.tidyverse.org/reference/select.html) to extract selected variables for further analyses.
+
+```{r}
+stu_qqq_SG_v2 <- sfu_qqq_SG %>%
+  select(CNTSTUID,PV1MATH,PV1READ,PV1SCIE,STRATUM,ST004D01T,ESCS) %>%
+  rename(STUDENT_ID=CNTSTUID,
+         MATH=PV1MATH,
+         READING=PV1READ,
+         SCIENCE=PV1SCIE,
+         SCHOOL=STRATUM,
+         SOCIOECONOMIC_STATUS=ESCS,
+         GENDER=ST004D01T)
+```
+
+::: callout-note
+#### Original Submission
+
+According to the original submission, only PV1 values were used for further analysis.
+:::
+
+## 2.3 Data Wrangling
+
+::: panel-tabset
+#### Remove missing values
+
+The code chunk below uses to check missing values:
+
+```{r}
+sum(is.na(stu_qqq_SG_v2))
+```
+
+The code chunk below uses `drop_na()` to remove missing values:
+
+```{r}
+stu_qqq_SG_v3 <- stu_qqq_SG_v2 %>%   
+  drop_na() 
+sum(is.na(stu_qqq_SG_v3))
+```
+
+#### Recoding and binning
+
+Code below use `recode()` to recode gender and `nitle()` to bin socioeconomic status
+
+```{r}
+stu_qqq_SG_final <- stu_qqq_SG_v3 %>%
+  mutate(GENDER = recode(GENDER,
+                         `1` = "Female",
+                         `2` = "Male"),
+         SCHOOL = recode(SCHOOL,
+                         "SGP01" = "Public School",
+                         "SGP03" = "Private School")) %>%
+  mutate(SOCIOECONOMIC_STATUS = ntile(SOCIOECONOMIC_STATUS, 4), .after = SOCIOECONOMIC_STATUS) %>%
+  mutate(SOCIOECONOMIC_STATUS = recode(SOCIOECONOMIC_STATUS,
+                                      `1` = "Highly Disadvantaged",
+                                      `2` = "Disadvantaged",
+                                      `3` = "Advantaged",
+                                      `4` = "Highly Advantaged")) %>%
+  mutate(SOCIOECONOMIC_STATUS = factor(SOCIOECONOMIC_STATUS, 
+                                      levels = c("Highly Disadvantaged", "Disadvantaged", 
+                                                 "Advantaged", "Highly Advantaged"),
+                                      ordered = TRUE))
+```
+:::
+
+## 2.4 Final Dataset
+
+The final data is displayed by using `knitr::kable()` function.
+
+```{r}
+kable(head(stu_qqq_SG_final), "simple")
+```
+
+::: callout-note
+#### Original Submission
+
+Verified that sample data of final dataset is similar to that used in original submission.
+:::
+
+# 3 DataViz Makeover
+
+------------------------------------------------------------------------
+
+The following section details the critique and remake of the data visualisations prepared in the original submission.
+
+## 3.1 Makeover 1: **Distribution of Students’ Performance**
+
+### 3.1.1 Original DataViz
+
+::: panel-tabset
+#### MATH
+
+![](https://kbuathang-isss608-vaa.netlify.app/take-home_ex/take-home_ex1/Take-home_Ex1_files/figure-html/unnamed-chunk-12-1.png){fig-align="center" width="500"}
+
+#### READING
+
+![](https://kbuathang-isss608-vaa.netlify.app/take-home_ex/take-home_ex1/Take-home_Ex1_files/figure-html/unnamed-chunk-13-1.png){fig-align="center" width="500"}
+
+#### SCIENCE
+
+![](https://kbuathang-isss608-vaa.netlify.app/take-home_ex/take-home_ex1/Take-home_Ex1_files/figure-html/unnamed-chunk-14-1.png){fig-align="center" width="500"}
+:::
+
+### 3.1.2 Critique
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**Clarity**]{.underline}                                                                                                                                                                                                                                                                                                                                                                                                               |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| a.  💚 Axes labeling is generally neat and clear, with similar x-axis and y-axis limits across the 3 plots. A small improvement can be achieved in rotating the y-axis label so that it is more readable.                                                                                                                                                                                                                               |
+| b.  💚 Use of annotation and different colours to indicate the values of mean and median is clear.                                                                                                                                                                                                                                                                                                                                      |
+| c.  ❌ Title of the plot can include an overview of key insights generated from the plot, rather than just showing the conventional description of the plot. A subtitle can also be used to provide more details on the insights. The original submission did not make use of a subtitle.                                                                                                                                               |
+| d.  ❌ The distributions of the 3 domains are in separate plots on different tabs, as such, this makes any comparisons difficult.                                                                                                                                                                                                                                                                                                       |
+| e.  ❌ The addition of geom_vlines for the mean and median values on a histogram may be confusing, that is, it does provide any further insights apart from comparing the values across the 3 plots, which can be better achieved if they were combined and stacked in a single plot. To similarly indicate these values on the plot, a better approach will be to use a box plot, which can provide more quantile values for analysis. |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**Aesthetics**]{.underline}                                                                                                                                                                                                                                                                                                                                                                                                            |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| a.  💚 Title position on the chart is aligned.                                                                                                                                                                                                                                                                                                                                                                                          |
+| b.  💚 Use of different "soft" colours for different domains on different plots helps to make the plots less dull.                                                                                                                                                                                                                                                                                                                      |
+| c.  ❌ There seemed to be too much gridlines on the chart, which makes the chart area a bit busy. It would be better to use a theme that uses less gridlines.                                                                                                                                                                                                                                                                           |
+| d.  ❌ Both the mean and median lines, though in dashed '-' lines, are in darker colors than the plot, which may give an impression that the focus is on the 2 statistic values.                                                                                                                                                                                                                                                        |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+### 3.1.3 Sketch of Makeover design
+
+![](sketch1.png){fig-align="center"}
+
+### 3.1.4 Makeover DataViz
+
+The code chunk below was used to provide the DataViz makeover to address the above critique:
+
+```{r}
+stu_viz1 <- stu_qqq_SG_final %>% 
+  select(c("STUDENT_ID", "MATH", "READING", "SCIENCE")) %>% 
+  pivot_longer(cols = c("MATH", "READING", "SCIENCE"), names_to = "Domain", values_to = "SCORE")
+
+pal <- c("#159090", "#A034F0", "#FF8C00" )
+
+# below chunk is for annotation
+annotate <- data.frame(
+  label = c(paste("Median = ", toString(median(stu_qqq_SG_final$MATH))), 
+            paste("Median = ", toString(median(stu_qqq_SG_final$READING))),
+            paste("Median = ", toString(median(stu_qqq_SG_final$SCIENCE)))),
+  Domain = c("MATH", "READING", "SCIENCE"),
+  x = c(575, 550, 560),
+  y = c(300, 300, 300))
+
+pp <- ggplot(stu_viz1,
+       aes(x = SCORE,
+           y = 0,
+           fill = Domain)) +
+  geom_histogram(aes(y=after_stat(count)), bins = 25, alpha = 0.3, color = "grey") +
+  ggstance::geom_boxploth(width = 100,
+                          outlier.alpha = 0.4,
+                          alpha = 0.5) +
+  guides(fill=FALSE,
+         color=FALSE) + 
+  scale_fill_manual(values = pal, guide = "none") +
+  labs(x="Domain Score", 
+       y="Count") +
+  scale_y_continuous(limits = c(-50,1000)) +
+  facet_wrap(~Domain, nrow = 3, scales = "free_y", strip.position = "top") +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        strip.placement = "outside",
+        axis.title.y = element_text(angle=0, vjust = 0.5)) +
+  plot_annotation(title = "Singapore students performed better in Math and Science than Reading", subtitle = "2022 PISA: Median performance for both Math and Science were higher than that for Reading, \nbut differences are small")
+
+pp + geom_label(data = annotate,
+                mapping = aes(x=x, y=y, label=label),
+                size = 2.5,
+                fill = NA)
+```
+
+**Improvements from the makeover:**
+
+Clarity:
+
+-   Title and subtitle used to provide meaningful context for the plot, so that the audience can better make their own interpretations and form their own insights.
+-   Combined the 3 separate plots into 1 plot, sharing the same x- and y-axis scale, so that easier visual comparisons can be made.
+-   Instead of showing the mean and median as vertical lines, a box plot is used to visualise the quantile values.
+-   The clear annotation in original submission is retained.
+
+Aesthetics:
+
+-   Number of gridlines are reduced and ink reduced as well, so that they do not interfere too much with the important details on the plot.
+-   y-axis title is rotated for easier reading
+-   Use of soft colors which are friendly for people with colour-blindness for the histograms.
+
+::: callout-note
+#### Additional Comments
+
+The usage of a histogram follows the choice of the original designer, assuming that there is a reason for using a histogram. Another option would be to use a kernel density curve instead of a histogram, which will provide a smooth curve that estimates the frequency distribution without having to "bin" the data.
+:::
+
+## 3.2 Makeover 2: **Performance and Gender**
+
+### 3.2.1 Original DataViz
+
+![](https://kbuathang-isss608-vaa.netlify.app/take-home_ex/take-home_ex1/Take-home_Ex1_files/figure-html/unnamed-chunk-15-1.png){fig-align="center"}
+
+### 3.2.2 Critique
+
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**Clarity**]{.underline}                                                                                                                                                                                                                                   |
+|                                                                                                                                                                                                                                                             |
+| a.  💚 Placing the plots for the 3 domains one on top of the other is good, as it helps the viewer to make visual comparisons.                                                                                                                              |
+| b.  ❌ However, stacking the 2 density distributions for the 2 genders together on the same grid makes the plot difficult to read, as the 2 distributions are very similar and nearly overlap each other. A better plot would be to use the ridgeline plot. |
+| c.  ❌ Does not have a title and subtitle to provide context and/or insights derived from the visualisation.                                                                                                                                                |
+| d.  ❌ The y-axis of the 3 plots are in different ranges, hence making them more difficult to be compared visually.                                                                                                                                         |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**Aesthetics**]{.underline}                                                                                                                                                                                                                                |
+|                                                                                                                                                                                                                                                             |
+| a.  💚 Overall, the plot is neat and the information is shown in clear fonts and font sizes.                                                                                                                                                                |
+| b.  💚 Use of different "soft" colours for different genders helps to make the plots less dull.                                                                                                                                                             |
+| c.  ❌ There seemed to be too much gridlines on the chart, which makes the chart area a bit busy. It would be better to use a theme that uses less gridlines. In this case, gridlines are more or less redundant.                                           |
+| d.  ❌ The same legend is repeated 3 times, which is redundant.                                                                                                                                                                                             |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+### 3.2.3 Sketch of Makeover design
+
+![](Sketch2.png){fig-align="center" width="477"}
+
+### 3.2.4 Makeover DataViz
+
+The code chunk below was used to provide the DataViz makeover to address the above critique:
+
+```{r}
+stu_viz2 <- stu_qqq_SG_final %>% 
+  select(c("STUDENT_ID", "MATH", "READING", "SCIENCE", "GENDER")) %>% 
+  pivot_longer(cols = c("MATH", "READING", "SCIENCE"), names_to = "Domain", values_to = "SCORE")
+
+stu_viz2["Gender_Domain"] <- paste0(stu_viz2$Domain, " (", stu_viz2$GENDER, ")")
+
+ggplot(stu_viz2,
+       aes(x=SCORE,
+           y=Gender_Domain,
+           fill=factor(stat(quantile)))) +
+  stat_density_ridges(
+    geom="density_ridges_gradient",
+    calc_ecdf = T,
+    quantiles = 4,
+    quantile_lines = T) +
+  scale_fill_viridis_d(name = "Quantiles", alpha = 0.5,
+                       labels = c("(0,0.25]",
+                                  "(0.25,0.5]",
+                                  "(0.5, 0.75]",
+                                  "(0.75, 1]")) +
+  labs(x = "Domain score",
+       y = "Domain by \nGender") +
+  theme_ridges() +
+  theme(axis.title.y = element_text(angle = 0, hjust = 0.5),
+        axis.title.x = element_text(hjust = 0.5),
+        axis.text = element_text(size = 8, color = "grey10"),
+        text = element_text(size = 12, color = "grey10")) +
+  plot_annotation(title = "Male students performed better in Math and Science", subtitle = "More male students obtained higher scores for Math and Science, while female students did \nbetter in Reading")
+```
+
+**Improvements from the makeover:**
+
+Clarity:
+
+-   Ridgeline plot is used for visualising the 6 density distributions as it provides a good way to compare multiple distributions on the same plot.
+-   Title and subtitle used to provide meaningful context for the plot, so that the audience can better make their own interpretations and form their own insights.
+-   Synchronised the y- and x-axis for all the plots for easier visual comparisons.
+-   Added quantiles on the density curve so that finer comparisons can be made on quantile values.
+
+Aesthetics:
+
+-   Number of gridlines are reduced and ink reduced as well, so that they do not interfere too much with the important details on the plot.
+-   y-axis title is rotated for easier reading
+-   Reduced the need for legend to show GENDER as this is already indicated on the Rigeline plot.
+
+## 3.3 Makeover 3: **Performance and School Type**
+
+For this makeover, the original focused more on the Math performance, hence I have used the Math performance for my makeover too.
+
+### 3.3.1 Original DataViz
+
+![](images/screenshot-01.png){fig-align="center"}
+
+### 3.2.2 Critique
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**Clarity**]{.underline}                                                                                                                                                 |
+|                                                                                                                                                                           |
+| a.  💚 Individually, both the box plot and the density distribution of the Math score by school type are clear in showing the data.                                       |
+| b.  ❌ However, they 2 plots are plotted separately. A better plot would be one where the boxplot is placed below each density curve, such as that of the raincloud plot. |
+| c.  ❌ Does not have a title and subtitle to provide context and/or insights derived from the visualisation.                                                              |
+| d.  ❌ The axes of the 2 plots are switched, hence making them more difficult to be compared visually.                                                                    |
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**Aesthetics**]{.underline}                                                                                                                                              |
+|                                                                                                                                                                           |
+| a.  💚 Overall, the individual plots are neat and the information is shown in clear fonts and font sizes.                                                                 |
+| b.  ❌ x-axis ticks on the boxplot is redundant since x is a categorical variable.                                                                                        |
+| c.  ❌ The colours used in both plots are different, though there is not much reason for them to be different since both plots are referirng to the school type.          |
+| d.  ❌ y-axis titles can be flipped for better readability.                                                                                                               |
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+### 3.3.3 Sketch of Makeover design
+
+![](sketch3.png){fig-align="center" width="477"}
+
+### 3.3.4 Makeover DataViz
+
+The code chunk below was used to provide the DataViz makeover to address the above critique:
+
+```{r}
+stu_viz3 <- stu_qqq_SG_final %>% 
+  select(c("STUDENT_ID", "MATH", "SCHOOL"))
+
+ggplot(stu_viz3,
+       aes(x=SCHOOL,
+           y=MATH)) +
+  stat_halfeye(adjust=0.5,
+               justification=-0.2,
+               .width=0,
+               point_colour = NA,
+               scale=0.4,
+               fill = "blue",
+               alpha = 0.4) +
+  geom_boxplot(width=.1,
+               outlier.alpha = 0.4,
+               outlier.color = "blue") +
+  stat_dots(side = "left",
+            justification = 1.1,
+            binwidth = unit(0.0022, "npc"),
+            dotsize = 1,
+            alpha = 0.4,
+            position = "dodge",
+            color = "black") +
+  labs(y="Math score") +
+  coord_flip(xlim = c(1.4, 1.8)) +
+  theme_economist() +
+  theme(axis.title.y = element_blank(),
+        axis.title.x = element_text(color = "grey30")) +
+  plot_annotation(title = "Private school students achieve better performance in PISA 2022", subtitle = "Deeper look suggests possible reason due to performance of public schools \nbeing more disparate")
+  
+```
+
+**Improvements from the makeover:**
+
+Clarity:
+
+-   Raincloud plot is used as it allows for both the density curve and boxplot used in the original submission to be placed on the same plot.
+-   Title and subtitle used to provide meaningful context for the plot, so that the audience can better make their own interpretations and form their own insights.
+-   Synchronised the y- and x-axis for all the plots for easier visual comparisons.
+-   The dot plot that is added provided additional perspectives, e.g. showing that the number of private school students is much smaller than that of public school students.
+
+Aesthetics:
+
+-   Synchronised the x-axis for easier comparisons.
+-   Gridlines are removed since they are redundant in the raincloud plot.
+
+## 3.4 Makeover 4: **Performance and Socioeconomic Status**
+
+For this makeover, the original focused more on the Math performance, hence I have used the Math performance for my makeover too.
+
+### 3.4.1 Original DataViz
+
+![](images/screenshot2-01.jpg){fig-align="center"}
+
+### 3.4.2 Critique
+
+The critique is similar to that in 3.3 as the plots used are similar.
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**Clarity**]{.underline}                                                                                                                                                |
+|                                                                                                                                                                          |
+| a.  💚 Individually, both the box plot and the density distribution of the Math score by socioeconomic status are clear in showing the data.                             |
+| b.  ❌ However, they 2 plots are plotted separately. A better plot would be one where the boxplot is placed below the density curve, such as that of the raincloud plot. |
+| c.  ❌ Does not have a title and subtitle to provide context and/or insights derived from the visualisation.                                                             |
+| d.  ❌ The axes of the 2 plots are switched, hence making them more difficult to be compared visually.                                                                   |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [**Aesthetics**]{.underline}                                                                                                                                             |
+|                                                                                                                                                                          |
+| a.  💚 Overall, the individual plots are neat and the information is shown in clear fonts and font sizes.                                                                |
+| b.  ❌ x-axis ticks on the boxplot is redundant since x is a categorical variable.                                                                                       |
+| c.  ❌ The colours used in both plots are different, though there is not much reason for them to be different since both plots are referirng to the school type.         |
+| d.  ❌ y-axis titles can be flipped for better readability.                                                                                                              |
+| e.  ❌ Use of different themes for both plots makes the overall look and feel somewhat disjointed.                                                                       |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+### 3.4.3 Sketch of Makeover design
+
+![](sketch4.png){fig-align="center"}
+
+### 3.4.4 Makeover DataViz
+
+The code chunk below was used to provide the DataViz makeover to address the above critique:
+
+```{r}
+stu_viz4 <- stu_qqq_SG_final %>% 
+  select(c("STUDENT_ID", "MATH", "SOCIOECONOMIC_STATUS"))
+
+pal <- c("#FF8C00", "#A034F0", "#159090", "red")
+
+ggplot(stu_viz4,
+       aes(x=SOCIOECONOMIC_STATUS,
+           y=MATH)) +
+  stat_halfeye(aes(color=SOCIOECONOMIC_STATUS, 
+                   fill=after_scale(colorspace::lighten(color, .3))),
+               adjust=0.5,
+               justification=-0.3,
+               .width=0,
+               point_colour = NA,
+               scale=0.7,
+               alpha = 0.4) +
+  geom_boxplot(width=.1,
+               outlier.alpha = 0.4,
+               outlier.color = "blue") +
+  scale_color_manual(values = pal, guide = "none") +
+  scale_fill_manual(values = pal, guide = "none") +
+  labs(y="Math score") +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.title.x = element_text(color = "grey30")) +
+  plot_annotation(title = "Students with better socioeconomic status achieve better performance", subtitle = "Results show relatively big difference between upper and lower tiers of socioeconomic status")
+```
+
+**Improvements from the makeover:**
+
+Clarity:
+
+-   Combined the density curve and the boxplot on the same plot for easier comparisons, but did not choose the full raincloud plot (since the dot plot is not included) so that the plot will not be too cluttered.
+-   Title and subtitle used to provide meaningful context for the plot, so that the audience can better make their own interpretations and form their own insights.
+-   Synchronised the y- and x-axis for all the plots for easier visual comparisons.
+
+Aesthetics:
+
+-   Synchronised the x-axis for easier comparisons.
+-   Number of gridlines are reduced and ink reduced as well, so that they do not interfere too much with the important details on the plot.
+
+# 4 Conclusion
+
+------------------------------------------------------------------------
+
+This exercise provided an opportunity to assess critically on data visualisations that were prepared by others, to better understand what works, and how it can be improved from the perspective of a non-expert viewer, and helped to reinforce the concepts of good data visualisations taught in class.
+
+::: callout-important
+#### Credits
+
+Many thanks to the original creator of the data visualisations used in this exercise. 😊
+:::

@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2024-01-27">
+
+<title>DataViz Makeover of Take-Home Exercise 1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../images/Site_logo.png" alt="" class="navbar-logo">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">Hands-on Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html" rel="" target="">
+ <span class="dropdown-text">Hands-on Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html" rel="" target="">
+ <span class="dropdown-text">Hands-on Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex03a/Hands-on_Ex03a.html" rel="" target="">
+ <span class="dropdown-text">Hands-on Exercise 3a</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex03b/Hands-on_Ex03b.html" rel="" target="">
+ <span class="dropdown-text">Hands-on Exercise 3b</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex04a/Hands-on_Ex04a.html" rel="" target="">
+ <span class="dropdown-text">Hands-on Exercise 4a</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex04b/Hands-on_Ex04b.html" rel="" target="">
+ <span class="dropdown-text">Hands-on Exercise 4b</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex04c/Hands-on_Ex04c.html" rel="" target="">
+ <span class="dropdown-text">Hands-on Exercise 4c</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex04d/Hands-on_Ex04d.html" rel="" target="">
+ <span class="dropdown-text">Hands-on Exercise 4d</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">In-class Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex01/In-class_Ex01.html" rel="" target="">
+ <span class="dropdown-text">In-class Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex01/In-class_Ex02.html" rel="" target="">
+ <span class="dropdown-text">In-class Exercise 2</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">Take-Home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html" rel="" target="">
+ <span class="dropdown-text">Take-Home Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html" rel="" target="">
+ <span class="dropdown-text">Take-Home Exercise 2</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-project" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">Project</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-project">    
+        <li class="dropdown-header">Coming Soon</li>
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target=""><i class="bi bi-house-door" role="img">
+</i> 
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target=""><i class="bi bi-patch-question" role="img">
+</i> 
+ <span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1 Overview</a></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">2 Getting started</a>
+  <ul class="collapse">
+  <li><a href="#loading-r-packages" id="toc-loading-r-packages" class="nav-link" data-scroll-target="#loading-r-packages">2.1 Loading R packages</a></li>
+  <li><a href="#importing-pisa-data" id="toc-importing-pisa-data" class="nav-link" data-scroll-target="#importing-pisa-data">2.2 <strong>Importing PISA data</strong></a></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">2.3 Data Wrangling</a></li>
+  <li><a href="#final-dataset" id="toc-final-dataset" class="nav-link" data-scroll-target="#final-dataset">2.4 Final Dataset</a></li>
+  </ul></li>
+  <li><a href="#dataviz-makeover" id="toc-dataviz-makeover" class="nav-link" data-scroll-target="#dataviz-makeover">3 DataViz Makeover</a>
+  <ul class="collapse">
+  <li><a href="#makeover-1-distribution-of-students-performance" id="toc-makeover-1-distribution-of-students-performance" class="nav-link" data-scroll-target="#makeover-1-distribution-of-students-performance">3.1 Makeover 1: <strong>Distribution of Students’ Performance</strong></a>
+  <ul class="collapse">
+  <li><a href="#original-dataviz" id="toc-original-dataviz" class="nav-link" data-scroll-target="#original-dataviz">3.1.1 Original DataViz</a></li>
+  <li><a href="#critique" id="toc-critique" class="nav-link" data-scroll-target="#critique">3.1.2 Critique</a></li>
+  <li><a href="#sketch-of-makeover-design" id="toc-sketch-of-makeover-design" class="nav-link" data-scroll-target="#sketch-of-makeover-design">3.1.3 Sketch of Makeover design</a></li>
+  <li><a href="#makeover-dataviz" id="toc-makeover-dataviz" class="nav-link" data-scroll-target="#makeover-dataviz">3.1.4 Makeover DataViz</a></li>
+  </ul></li>
+  <li><a href="#makeover-2-performance-and-gender" id="toc-makeover-2-performance-and-gender" class="nav-link" data-scroll-target="#makeover-2-performance-and-gender">3.2 Makeover 2: <strong>Performance and Gender</strong></a>
+  <ul class="collapse">
+  <li><a href="#original-dataviz-1" id="toc-original-dataviz-1" class="nav-link" data-scroll-target="#original-dataviz-1">3.2.1 Original DataViz</a></li>
+  <li><a href="#critique-1" id="toc-critique-1" class="nav-link" data-scroll-target="#critique-1">3.2.2 Critique</a></li>
+  <li><a href="#sketch-of-makeover-design-1" id="toc-sketch-of-makeover-design-1" class="nav-link" data-scroll-target="#sketch-of-makeover-design-1">3.2.3 Sketch of Makeover design</a></li>
+  <li><a href="#makeover-dataviz-1" id="toc-makeover-dataviz-1" class="nav-link" data-scroll-target="#makeover-dataviz-1">3.2.4 Makeover DataViz</a></li>
+  </ul></li>
+  <li><a href="#makeover-3-performance-and-school-type" id="toc-makeover-3-performance-and-school-type" class="nav-link" data-scroll-target="#makeover-3-performance-and-school-type">3.3 Makeover 3: <strong>Performance and School Type</strong></a>
+  <ul class="collapse">
+  <li><a href="#original-dataviz-2" id="toc-original-dataviz-2" class="nav-link" data-scroll-target="#original-dataviz-2">3.3.1 Original DataViz</a></li>
+  <li><a href="#critique-2" id="toc-critique-2" class="nav-link" data-scroll-target="#critique-2">3.2.2 Critique</a></li>
+  <li><a href="#sketch-of-makeover-design-2" id="toc-sketch-of-makeover-design-2" class="nav-link" data-scroll-target="#sketch-of-makeover-design-2">3.3.3 Sketch of Makeover design</a></li>
+  <li><a href="#makeover-dataviz-2" id="toc-makeover-dataviz-2" class="nav-link" data-scroll-target="#makeover-dataviz-2">3.3.4 Makeover DataViz</a></li>
+  </ul></li>
+  <li><a href="#makeover-4-performance-and-socioeconomic-status" id="toc-makeover-4-performance-and-socioeconomic-status" class="nav-link" data-scroll-target="#makeover-4-performance-and-socioeconomic-status">3.4 Makeover 4: <strong>Performance and Socioeconomic Status</strong></a>
+  <ul class="collapse">
+  <li><a href="#original-dataviz-3" id="toc-original-dataviz-3" class="nav-link" data-scroll-target="#original-dataviz-3">3.4.1 Original DataViz</a></li>
+  <li><a href="#critique-3" id="toc-critique-3" class="nav-link" data-scroll-target="#critique-3">3.4.2 Critique</a></li>
+  <li><a href="#sketch-of-makeover-design-3" id="toc-sketch-of-makeover-design-3" class="nav-link" data-scroll-target="#sketch-of-makeover-design-3">3.4.3 Sketch of Makeover design</a></li>
+  <li><a href="#makeover-dataviz-3" id="toc-makeover-dataviz-3" class="nav-link" data-scroll-target="#makeover-dataviz-3">3.4.4 Makeover DataViz</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">4 Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">DataViz Makeover of Take-Home Exercise 1</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
+<p class="subtitle lead">Take-home Exercise 2</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 27, 2024</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">January 27, 2024</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<section id="overview" class="level1">
+<h1>1 Overview</h1>
+<hr>
+<p>In this take-home exercise, a Take-home Exercise 1 submission (<a href="https://kbuathang-isss608-vaa.netlify.app/take-home_ex/take-home_ex1/take-home_ex1">original submission here</a>) prepared by my classmate in ISSS608 AY 2023-24 Jan Term, was chosen for DataViz makeover. The submission was assessed in terms of both clarity and aesthetics, and a sketch of an alternative DataViz design was prepared using data visualisation design principles and best practices learnt in first 2 lessons. The alternative design was next implemented using R ggplot2, ggplot2 extensions and tidyverse packages.</p>
+</section>
+<section id="getting-started" class="level1">
+<h1>2 Getting started</h1>
+<hr>
+<section id="loading-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="loading-r-packages">2.1 Loading R packages</h2>
+<p>The&nbsp;<code>pacman::p_load()</code>&nbsp;function is used to install and load the required R packages into the R environment, as below.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, haven, ggrepel, patchwork, ggplot2, </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               ggthemes, hrbrthemes, dplyr, tidyr, knitr, ggridges, ggdist, ggstance)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Compared to the original submission, these 2 additional package were loaded:</p>
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/ggdist/">ggdist</a>: an R package that provides a flexible set of ggplot2 geoms and stats for visualising distributions and uncertainties</li>
+<li><a href="https://exts.ggplot2.tidyverse.org/ggstance.html">ggstance</a>: an R paclage that extends ggplot2 and provides the horizontal versions of ggplot2 geoms</li>
+</ul>
+</section>
+<section id="importing-pisa-data" class="level2">
+<h2 class="anchored" data-anchor-id="importing-pisa-data">2.2 <strong>Importing PISA data</strong></h2>
+<p>To reproduce the steps used in the original submission in preparing the dataset, the following code chunk uses the <a href="https://haven.tidyverse.org/reference/read_sas.html"><code>read_sas()</code></a>&nbsp;of&nbsp;<a href="https://haven.tidyverse.org/">haven</a>&nbsp;to import PISA data into R environment.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>stu_qqq <span class="ot">&lt;-</span> <span class="fu">read_sas</span>(<span class="st">"data/cy08msp_stu_qqq.sas7bdat"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Filtering the entire data file for records belonging to Singapore students.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>stu_qqq_SG <span class="ot">&lt;-</span> stu_qqq <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(CNT <span class="sc">==</span> <span class="st">"SGP"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Saving the records belonging to Singapore students into “stu_qqq_SG.rds” file for easier loading (no need to extract the records from the entire dataset repeatedly).</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(stu_qqq_SG,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>          <span class="st">"data/stu_qqq_SG.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Loading the extract records from the saved “stu_qqq_SG.rds” file.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sfu_qqq_SG <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/stu_qqq_SG.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Following code chunk uses <a href="https://dplyr.tidyverse.org/reference/select.html"><code>select()</code></a>&nbsp;to extract selected variables for further analyses.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>stu_qqq_SG_v2 <span class="ot">&lt;-</span> sfu_qqq_SG <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CNTSTUID,PV1MATH,PV1READ,PV1SCIE,STRATUM,ST004D01T,ESCS) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">STUDENT_ID=</span>CNTSTUID,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">MATH=</span>PV1MATH,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">READING=</span>PV1READ,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">SCIENCE=</span>PV1SCIE,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">SCHOOL=</span>STRATUM,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">SOCIOECONOMIC_STATUS=</span>ESCS,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">GENDER=</span>ST004D01T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Original Submission
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>According to the original submission, only PV1 values were used for further analysis.</p>
+</div>
+</div>
+</section>
+<section id="data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="data-wrangling">2.3 Data Wrangling</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Remove missing values</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Recoding and binning</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>The code chunk below uses to check missing values:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(stu_qqq_SG_v2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 47</code></pre>
+</div>
+</div>
+<p>The code chunk below uses&nbsp;<code>drop_na()</code>&nbsp;to remove missing values:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>stu_qqq_SG_v3 <span class="ot">&lt;-</span> stu_qqq_SG_v2 <span class="sc">%&gt;%</span>   </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(stu_qqq_SG_v3))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Code below use&nbsp;<code>recode()</code>&nbsp;to recode gender and&nbsp;<code>nitle()</code>&nbsp;to bin socioeconomic status</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>stu_qqq_SG_final <span class="ot">&lt;-</span> stu_qqq_SG_v3 <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">GENDER =</span> <span class="fu">recode</span>(GENDER,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                         <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Female"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                         <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Male"</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">SCHOOL =</span> <span class="fu">recode</span>(SCHOOL,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"SGP01"</span> <span class="ot">=</span> <span class="st">"Public School"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"SGP03"</span> <span class="ot">=</span> <span class="st">"Private School"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SOCIOECONOMIC_STATUS =</span> <span class="fu">ntile</span>(SOCIOECONOMIC_STATUS, <span class="dv">4</span>), <span class="at">.after =</span> SOCIOECONOMIC_STATUS) <span class="sc">%&gt;%</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SOCIOECONOMIC_STATUS =</span> <span class="fu">recode</span>(SOCIOECONOMIC_STATUS,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Highly Disadvantaged"</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Disadvantaged"</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Advantaged"</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">`</span><span class="at">4</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Highly Advantaged"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SOCIOECONOMIC_STATUS =</span> <span class="fu">factor</span>(SOCIOECONOMIC_STATUS, </span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Highly Disadvantaged"</span>, <span class="st">"Disadvantaged"</span>, </span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>                                                 <span class="st">"Advantaged"</span>, <span class="st">"Highly Advantaged"</span>),</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">ordered =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="final-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="final-dataset">2.4 Final Dataset</h2>
+<p>The final data is displayed by using&nbsp;<code>knitr::kable()</code>&nbsp;function.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(stu_qqq_SG_final), <span class="st">"simple"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">STUDENT_ID</th>
+<th style="text-align: center;">MATH</th>
+<th style="text-align: left;">READING</th>
+<th>SCIENCE S</th>
+<th>CHOOL G</th>
+<th>ENDER S</th>
+<th style="text-align: left;">OCIOECONOMIC_STATUS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">70200001</td>
+<td style="text-align: center;">639.004</td>
+<td style="text-align: left;">676.298</td>
+<td>710.634</td>
+<td>Public School</td>
+<td>Female</td>
+<td style="text-align: left;">Disadvantaged</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">70200002</td>
+<td style="text-align: center;">697.191</td>
+<td style="text-align: left;">625.585</td>
+<td>670.646</td>
+<td>Public School</td>
+<td>Male</td>
+<td style="text-align: left;">Advantaged</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">70200003</td>
+<td style="text-align: center;">693.710</td>
+<td style="text-align: left;">620.116</td>
+<td>666.095</td>
+<td>Public School</td>
+<td>Male</td>
+<td style="text-align: left;">Highly Disadvantaged</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">70200004</td>
+<td style="text-align: center;">427.317</td>
+<td style="text-align: left;">381.495</td>
+<td>340.308</td>
+<td>Public School</td>
+<td>Male</td>
+<td style="text-align: left;">Highly Disadvantaged</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">70200005</td>
+<td style="text-align: center;">436.462</td>
+<td style="text-align: left;">448.199</td>
+<td>456.333</td>
+<td>Public School</td>
+<td>Female</td>
+<td style="text-align: left;">Disadvantaged</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">70200006</td>
+<td style="text-align: center;">569.982</td>
+<td style="text-align: left;">469.441</td>
+<td>475.158</td>
+<td>Public School</td>
+<td>Female</td>
+<td style="text-align: left;">Disadvantaged</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Original Submission
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Verified that sample data of final dataset is similar to that used in original submission.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="dataviz-makeover" class="level1">
+<h1>3 DataViz Makeover</h1>
+<hr>
+<p>The following section details the critique and remake of the data visualisations prepared in the original submission.</p>
+<section id="makeover-1-distribution-of-students-performance" class="level2">
+<h2 class="anchored" data-anchor-id="makeover-1-distribution-of-students-performance">3.1 Makeover 1: <strong>Distribution of Students’ Performance</strong></h2>
+<section id="original-dataviz" class="level3">
+<h3 class="anchored" data-anchor-id="original-dataviz">3.1.1 Original DataViz</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">MATH</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">READING</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">SCIENCE</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://kbuathang-isss608-vaa.netlify.app/take-home_ex/take-home_ex1/Take-home_Ex1_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="500"></p>
+</figure>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://kbuathang-isss608-vaa.netlify.app/take-home_ex/take-home_ex1/Take-home_Ex1_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="500"></p>
+</figure>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://kbuathang-isss608-vaa.netlify.app/take-home_ex/take-home_ex1/Take-home_Ex1_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="500"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="critique" class="level3">
+<h3 class="anchored" data-anchor-id="critique">3.1.2 Critique</h3>
+<table class="table">
+<colgroup>
+<col style="width: 100%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><p><u><strong>Clarity</strong></u></p>
+<ol type="a">
+<li>💚 Axes labeling is generally neat and clear, with similar x-axis and y-axis limits across the 3 plots. A small improvement can be achieved in rotating the y-axis label so that it is more readable.</li>
+<li>💚 Use of annotation and different colours to indicate the values of mean and median is clear.</li>
+<li>❌ Title of the plot can include an overview of key insights generated from the plot, rather than just showing the conventional description of the plot. A subtitle can also be used to provide more details on the insights. The original submission did not make use of a subtitle.</li>
+<li>❌ The distributions of the 3 domains are in separate plots on different tabs, as such, this makes any comparisons difficult.</li>
+<li>❌ The addition of geom_vlines for the mean and median values on a histogram may be confusing, that is, it does provide any further insights apart from comparing the values across the 3 plots, which can be better achieved if they were combined and stacked in a single plot. To similarly indicate these values on the plot, a better approach will be to use a box plot, which can provide more quantile values for analysis.</li>
+</ol></td>
+</tr>
+<tr class="even">
+<td><p><u><strong>Aesthetics</strong></u></p>
+<ol type="a">
+<li>💚 Title position on the chart is aligned.</li>
+<li>💚 Use of different “soft” colours for different domains on different plots helps to make the plots less dull.</li>
+<li>❌ There seemed to be too much gridlines on the chart, which makes the chart area a bit busy. It would be better to use a theme that uses less gridlines.</li>
+<li>❌ Both the mean and median lines, though in dashed ‘-’ lines, are in darker colors than the plot, which may give an impression that the focus is on the 2 statistic values.</li>
+</ol></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sketch-of-makeover-design" class="level3">
+<h3 class="anchored" data-anchor-id="sketch-of-makeover-design">3.1.3 Sketch of Makeover design</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="sketch1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="makeover-dataviz" class="level3">
+<h3 class="anchored" data-anchor-id="makeover-dataviz">3.1.4 Makeover DataViz</h3>
+<p>The code chunk below was used to provide the DataViz makeover to address the above critique:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>stu_viz1 <span class="ot">&lt;-</span> stu_qqq_SG_final <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"STUDENT_ID"</span>, <span class="st">"MATH"</span>, <span class="st">"READING"</span>, <span class="st">"SCIENCE"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"MATH"</span>, <span class="st">"READING"</span>, <span class="st">"SCIENCE"</span>), <span class="at">names_to =</span> <span class="st">"Domain"</span>, <span class="at">values_to =</span> <span class="st">"SCORE"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#159090"</span>, <span class="st">"#A034F0"</span>, <span class="st">"#FF8C00"</span> )</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># below chunk is for annotation</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>annotate <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">label =</span> <span class="fu">c</span>(<span class="fu">paste</span>(<span class="st">"Median = "</span>, <span class="fu">toString</span>(<span class="fu">median</span>(stu_qqq_SG_final<span class="sc">$</span>MATH))), </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>            <span class="fu">paste</span>(<span class="st">"Median = "</span>, <span class="fu">toString</span>(<span class="fu">median</span>(stu_qqq_SG_final<span class="sc">$</span>READING))),</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">paste</span>(<span class="st">"Median = "</span>, <span class="fu">toString</span>(<span class="fu">median</span>(stu_qqq_SG_final<span class="sc">$</span>SCIENCE)))),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Domain =</span> <span class="fu">c</span>(<span class="st">"MATH"</span>, <span class="st">"READING"</span>, <span class="st">"SCIENCE"</span>),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">575</span>, <span class="dv">550</span>, <span class="dv">560</span>),</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">300</span>, <span class="dv">300</span>, <span class="dv">300</span>))</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>pp <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(stu_viz1,</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> SCORE,</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> <span class="dv">0</span>,</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> Domain)) <span class="sc">+</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y=</span><span class="fu">after_stat</span>(count)), <span class="at">bins =</span> <span class="dv">25</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">color =</span> <span class="st">"grey"</span>) <span class="sc">+</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  ggstance<span class="sc">::</span><span class="fu">geom_boxploth</span>(<span class="at">width =</span> <span class="dv">100</span>,</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>                          <span class="at">outlier.alpha =</span> <span class="fl">0.4</span>,</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>                          <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill=</span><span class="cn">FALSE</span>,</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">color=</span><span class="cn">FALSE</span>) <span class="sc">+</span> </span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> pal, <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Domain Score"</span>, </span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">y=</span><span class="st">"Count"</span>) <span class="sc">+</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">50</span>,<span class="dv">1000</span>)) <span class="sc">+</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Domain, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">strip.position =</span> <span class="st">"top"</span>) <span class="sc">+</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.background =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">strip.placement =</span> <span class="st">"outside"</span>,</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">0</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"Singapore students performed better in Math and Science than Reading"</span>, <span class="at">subtitle =</span> <span class="st">"2022 PISA: Median performance for both Math and Science were higher than that for Reading, </span><span class="sc">\n</span><span class="st">but differences are small"</span>)</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>pp <span class="sc">+</span> <span class="fu">geom_label</span>(<span class="at">data =</span> annotate,</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>                <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y=</span>y, <span class="at">label=</span>label),</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>                <span class="at">size =</span> <span class="fl">2.5</span>,</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>                <span class="at">fill =</span> <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Improvements from the makeover:</strong></p>
+<p>Clarity:</p>
+<ul>
+<li>Title and subtitle used to provide meaningful context for the plot, so that the audience can better make their own interpretations and form their own insights.</li>
+<li>Combined the 3 separate plots into 1 plot, sharing the same x- and y-axis scale, so that easier visual comparisons can be made.</li>
+<li>Instead of showing the mean and median as vertical lines, a box plot is used to visualise the quantile values.</li>
+<li>The clear annotation in original submission is retained.</li>
+</ul>
+<p>Aesthetics:</p>
+<ul>
+<li>Number of gridlines are reduced and ink reduced as well, so that they do not interfere too much with the important details on the plot.</li>
+<li>y-axis title is rotated for easier reading</li>
+<li>Use of soft colors which are friendly for people with colour-blindness for the histograms.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Additional Comments
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The usage of a histogram follows the choice of the original designer, assuming that there is a reason for using a histogram. Another option would be to use a kernel density curve instead of a histogram, which will provide a smooth curve that estimates the frequency distribution without having to “bin” the data.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="makeover-2-performance-and-gender" class="level2">
+<h2 class="anchored" data-anchor-id="makeover-2-performance-and-gender">3.2 Makeover 2: <strong>Performance and Gender</strong></h2>
+<section id="original-dataviz-1" class="level3">
+<h3 class="anchored" data-anchor-id="original-dataviz-1">3.2.1 Original DataViz</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://kbuathang-isss608-vaa.netlify.app/take-home_ex/take-home_ex1/Take-home_Ex1_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="critique-1" class="level3">
+<h3 class="anchored" data-anchor-id="critique-1">3.2.2 Critique</h3>
+<table class="table">
+<colgroup>
+<col style="width: 100%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><p><u><strong>Clarity</strong></u></p>
+<ol type="a">
+<li>💚 Placing the plots for the 3 domains one on top of the other is good, as it helps the viewer to make visual comparisons.</li>
+<li>❌ However, stacking the 2 density distributions for the 2 genders together on the same grid makes the plot difficult to read, as the 2 distributions are very similar and nearly overlap each other. A better plot would be to use the ridgeline plot.</li>
+<li>❌ Does not have a title and subtitle to provide context and/or insights derived from the visualisation.</li>
+<li>❌ The y-axis of the 3 plots are in different ranges, hence making them more difficult to be compared visually.</li>
+</ol></td>
+</tr>
+<tr class="even">
+<td><p><u><strong>Aesthetics</strong></u></p>
+<ol type="a">
+<li>💚 Overall, the plot is neat and the information is shown in clear fonts and font sizes.</li>
+<li>💚 Use of different “soft” colours for different genders helps to make the plots less dull.</li>
+<li>❌ There seemed to be too much gridlines on the chart, which makes the chart area a bit busy. It would be better to use a theme that uses less gridlines. In this case, gridlines are more or less redundant.</li>
+<li>❌ The same legend is repeated 3 times, which is redundant.</li>
+</ol></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sketch-of-makeover-design-1" class="level3">
+<h3 class="anchored" data-anchor-id="sketch-of-makeover-design-1">3.2.3 Sketch of Makeover design</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Sketch2.png" class="img-fluid figure-img" width="477"></p>
+</figure>
+</div>
+</section>
+<section id="makeover-dataviz-1" class="level3">
+<h3 class="anchored" data-anchor-id="makeover-dataviz-1">3.2.4 Makeover DataViz</h3>
+<p>The code chunk below was used to provide the DataViz makeover to address the above critique:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>stu_viz2 <span class="ot">&lt;-</span> stu_qqq_SG_final <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"STUDENT_ID"</span>, <span class="st">"MATH"</span>, <span class="st">"READING"</span>, <span class="st">"SCIENCE"</span>, <span class="st">"GENDER"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"MATH"</span>, <span class="st">"READING"</span>, <span class="st">"SCIENCE"</span>), <span class="at">names_to =</span> <span class="st">"Domain"</span>, <span class="at">values_to =</span> <span class="st">"SCORE"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>stu_viz2[<span class="st">"Gender_Domain"</span>] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(stu_viz2<span class="sc">$</span>Domain, <span class="st">" ("</span>, stu_viz2<span class="sc">$</span>GENDER, <span class="st">")"</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(stu_viz2,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x=</span>SCORE,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">y=</span>Gender_Domain,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill=</span><span class="fu">factor</span>(<span class="fu">stat</span>(quantile)))) <span class="sc">+</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_density_ridges</span>(</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">geom=</span><span class="st">"density_ridges_gradient"</span>,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">calc_ecdf =</span> T,</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">quantiles =</span> <span class="dv">4</span>,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">quantile_lines =</span> T) <span class="sc">+</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>(<span class="at">name =</span> <span class="st">"Quantiles"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"(0,0.25]"</span>,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"(0.25,0.5]"</span>,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"(0.5, 0.75]"</span>,</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"(0.75, 1]"</span>)) <span class="sc">+</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Domain score"</span>,</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Domain by </span><span class="sc">\n</span><span class="st">Gender"</span>) <span class="sc">+</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ridges</span>() <span class="sc">+</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>, <span class="at">color =</span> <span class="st">"grey10"</span>),</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">color =</span> <span class="st">"grey10"</span>)) <span class="sc">+</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"Male students performed better in Math and Science"</span>, <span class="at">subtitle =</span> <span class="st">"More male students obtained higher scores for Math and Science, while female students did </span><span class="sc">\n</span><span class="st">better in Reading"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Improvements from the makeover:</strong></p>
+<p>Clarity:</p>
+<ul>
+<li>Ridgeline plot is used for visualising the 6 density distributions as it provides a good way to compare multiple distributions on the same plot.</li>
+<li>Title and subtitle used to provide meaningful context for the plot, so that the audience can better make their own interpretations and form their own insights.</li>
+<li>Synchronised the y- and x-axis for all the plots for easier visual comparisons.</li>
+<li>Added quantiles on the density curve so that finer comparisons can be made on quantile values.</li>
+</ul>
+<p>Aesthetics:</p>
+<ul>
+<li>Number of gridlines are reduced and ink reduced as well, so that they do not interfere too much with the important details on the plot.</li>
+<li>y-axis title is rotated for easier reading</li>
+<li>Reduced the need for legend to show GENDER as this is already indicated on the Rigeline plot.</li>
+</ul>
+</section>
+</section>
+<section id="makeover-3-performance-and-school-type" class="level2">
+<h2 class="anchored" data-anchor-id="makeover-3-performance-and-school-type">3.3 Makeover 3: <strong>Performance and School Type</strong></h2>
+<p>For this makeover, the original focused more on the Math performance, hence I have used the Math performance for my makeover too.</p>
+<section id="original-dataviz-2" class="level3">
+<h3 class="anchored" data-anchor-id="original-dataviz-2">3.3.1 Original DataViz</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/screenshot-01.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="critique-2" class="level3">
+<h3 class="anchored" data-anchor-id="critique-2">3.2.2 Critique</h3>
+<table class="table">
+<colgroup>
+<col style="width: 100%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><p><u><strong>Clarity</strong></u></p>
+<ol type="a">
+<li>💚 Individually, both the box plot and the density distribution of the Math score by school type are clear in showing the data.</li>
+<li>❌ However, they 2 plots are plotted separately. A better plot would be one where the boxplot is placed below each density curve, such as that of the raincloud plot.</li>
+<li>❌ Does not have a title and subtitle to provide context and/or insights derived from the visualisation.</li>
+<li>❌ The axes of the 2 plots are switched, hence making them more difficult to be compared visually.</li>
+</ol></td>
+</tr>
+<tr class="even">
+<td><p><u><strong>Aesthetics</strong></u></p>
+<ol type="a">
+<li>💚 Overall, the individual plots are neat and the information is shown in clear fonts and font sizes.</li>
+<li>❌ x-axis ticks on the boxplot is redundant since x is a categorical variable.</li>
+<li>❌ The colours used in both plots are different, though there is not much reason for them to be different since both plots are referirng to the school type.</li>
+<li>❌ y-axis titles can be flipped for better readability.</li>
+</ol></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sketch-of-makeover-design-2" class="level3">
+<h3 class="anchored" data-anchor-id="sketch-of-makeover-design-2">3.3.3 Sketch of Makeover design</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="sketch3.png" class="img-fluid figure-img" width="477"></p>
+</figure>
+</div>
+</section>
+<section id="makeover-dataviz-2" class="level3">
+<h3 class="anchored" data-anchor-id="makeover-dataviz-2">3.3.4 Makeover DataViz</h3>
+<p>The code chunk below was used to provide the DataViz makeover to address the above critique:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>stu_viz3 <span class="ot">&lt;-</span> stu_qqq_SG_final <span class="sc">%&gt;%</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"STUDENT_ID"</span>, <span class="st">"MATH"</span>, <span class="st">"SCHOOL"</span>))</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(stu_viz3,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x=</span>SCHOOL,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">y=</span>MATH)) <span class="sc">+</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_halfeye</span>(<span class="at">adjust=</span><span class="fl">0.5</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">justification=</span><span class="sc">-</span><span class="fl">0.2</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">.width=</span><span class="dv">0</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">point_colour =</span> <span class="cn">NA</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">scale=</span><span class="fl">0.4</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> <span class="st">"blue"</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">width=</span>.<span class="dv">1</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">outlier.alpha =</span> <span class="fl">0.4</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">outlier.color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_dots</span>(<span class="at">side =</span> <span class="st">"left"</span>,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">justification =</span> <span class="fl">1.1</span>,</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">binwidth =</span> <span class="fu">unit</span>(<span class="fl">0.0022</span>, <span class="st">"npc"</span>),</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">dotsize =</span> <span class="dv">1</span>,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.4</span>,</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">position =</span> <span class="st">"dodge"</span>,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Math score"</span>) <span class="sc">+</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="fl">1.4</span>, <span class="fl">1.8</span>)) <span class="sc">+</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_economist</span>() <span class="sc">+</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"grey30"</span>)) <span class="sc">+</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"Private school students achieve better performance in PISA 2022"</span>, <span class="at">subtitle =</span> <span class="st">"Deeper look suggests possible reason due to performance of public schools </span><span class="sc">\n</span><span class="st">being more disparate"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Improvements from the makeover:</strong></p>
+<p>Clarity:</p>
+<ul>
+<li>Raincloud plot is used as it allows for both the density curve and boxplot used in the original submission to be placed on the same plot.</li>
+<li>Title and subtitle used to provide meaningful context for the plot, so that the audience can better make their own interpretations and form their own insights.</li>
+<li>Synchronised the y- and x-axis for all the plots for easier visual comparisons.</li>
+<li>The dot plot that is added provided additional perspectives, e.g.&nbsp;showing that the number of private school students is much smaller than that of public school students.</li>
+</ul>
+<p>Aesthetics:</p>
+<ul>
+<li>Synchronised the x-axis for easier comparisons.</li>
+<li>Gridlines are removed since they are redundant in the raincloud plot.</li>
+</ul>
+</section>
+</section>
+<section id="makeover-4-performance-and-socioeconomic-status" class="level2">
+<h2 class="anchored" data-anchor-id="makeover-4-performance-and-socioeconomic-status">3.4 Makeover 4: <strong>Performance and Socioeconomic Status</strong></h2>
+<p>For this makeover, the original focused more on the Math performance, hence I have used the Math performance for my makeover too.</p>
+<section id="original-dataviz-3" class="level3">
+<h3 class="anchored" data-anchor-id="original-dataviz-3">3.4.1 Original DataViz</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/screenshot2-01.jpg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="critique-3" class="level3">
+<h3 class="anchored" data-anchor-id="critique-3">3.4.2 Critique</h3>
+<p>The critique is similar to that in 3.3 as the plots used are similar.</p>
+<table class="table">
+<colgroup>
+<col style="width: 100%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><p><u><strong>Clarity</strong></u></p>
+<ol type="a">
+<li>💚 Individually, both the box plot and the density distribution of the Math score by socioeconomic status are clear in showing the data.</li>
+<li>❌ However, they 2 plots are plotted separately. A better plot would be one where the boxplot is placed below the density curve, such as that of the raincloud plot.</li>
+<li>❌ Does not have a title and subtitle to provide context and/or insights derived from the visualisation.</li>
+<li>❌ The axes of the 2 plots are switched, hence making them more difficult to be compared visually.</li>
+</ol></td>
+</tr>
+<tr class="even">
+<td><p><u><strong>Aesthetics</strong></u></p>
+<ol type="a">
+<li>💚 Overall, the individual plots are neat and the information is shown in clear fonts and font sizes.</li>
+<li>❌ x-axis ticks on the boxplot is redundant since x is a categorical variable.</li>
+<li>❌ The colours used in both plots are different, though there is not much reason for them to be different since both plots are referirng to the school type.</li>
+<li>❌ y-axis titles can be flipped for better readability.</li>
+<li>❌ Use of different themes for both plots makes the overall look and feel somewhat disjointed.</li>
+</ol></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sketch-of-makeover-design-3" class="level3">
+<h3 class="anchored" data-anchor-id="sketch-of-makeover-design-3">3.4.3 Sketch of Makeover design</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="sketch4.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="makeover-dataviz-3" class="level3">
+<h3 class="anchored" data-anchor-id="makeover-dataviz-3">3.4.4 Makeover DataViz</h3>
+<p>The code chunk below was used to provide the DataViz makeover to address the above critique:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>stu_viz4 <span class="ot">&lt;-</span> stu_qqq_SG_final <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"STUDENT_ID"</span>, <span class="st">"MATH"</span>, <span class="st">"SOCIOECONOMIC_STATUS"</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#FF8C00"</span>, <span class="st">"#A034F0"</span>, <span class="st">"#159090"</span>, <span class="st">"red"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(stu_viz4,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x=</span>SOCIOECONOMIC_STATUS,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">y=</span>MATH)) <span class="sc">+</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_halfeye</span>(<span class="fu">aes</span>(<span class="at">color=</span>SOCIOECONOMIC_STATUS, </span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill=</span><span class="fu">after_scale</span>(colorspace<span class="sc">::</span><span class="fu">lighten</span>(color, .<span class="dv">3</span>))),</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">adjust=</span><span class="fl">0.5</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">justification=</span><span class="sc">-</span><span class="fl">0.3</span>,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">.width=</span><span class="dv">0</span>,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">point_colour =</span> <span class="cn">NA</span>,</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">scale=</span><span class="fl">0.7</span>,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">width=</span>.<span class="dv">1</span>,</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>               <span class="at">outlier.alpha =</span> <span class="fl">0.4</span>,</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>               <span class="at">outlier.color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> pal, <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> pal, <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y=</span><span class="st">"Math score"</span>) <span class="sc">+</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"grey30"</span>)) <span class="sc">+</span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"Students with better socioeconomic status achieve better performance"</span>, <span class="at">subtitle =</span> <span class="st">"Results show relatively big difference between upper and lower tiers of socioeconomic status"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Improvements from the makeover:</strong></p>
+<p>Clarity:</p>
+<ul>
+<li>Combined the density curve and the boxplot on the same plot for easier comparisons, but did not choose the full raincloud plot (since the dot plot is not included) so that the plot will not be too cluttered.</li>
+<li>Title and subtitle used to provide meaningful context for the plot, so that the audience can better make their own interpretations and form their own insights.</li>
+<li>Synchronised the y- and x-axis for all the plots for easier visual comparisons.</li>
+</ul>
+<p>Aesthetics:</p>
+<ul>
+<li>Synchronised the x-axis for easier comparisons.</li>
+<li>Number of gridlines are reduced and ink reduced as well, so that they do not interfere too much with the important details on the plot.</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>4 Conclusion</h1>
+<hr>
+<p>This exercise provided an opportunity to assess critically on data visualisations that were prepared by others, to better understand what works, and how it can be improved from the perspective of a non-expert viewer, and helped to reinforce the concepts of good data visualisations taught in class.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Credits
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Many thanks to the original creator of the data visualisations used in this exercise. 😊</p>
+</div>
+</div>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">Copyright 2024</div>
+  </div>
+</footer>
+
+
+
+</body></html>
