@@ -66,9 +66,8 @@ Default information: - statistical details - Bayes Factor - sample sizes - distr
 
 -   When we are comparing two hypotheses, H1 (the alternate hypothesis) and H0 (the null hypothesis), the Bayes Factor is often written as B10. It can be defined mathematically as
 
-```{=html}
 <!-- -->
-```
+
 -   The [**Schwarz criterion**](https://www.statisticshowto.com/bayesian-information-criterion/) is one of the easiest ways to calculate rough approximation of the Bayes Factor.
 
 ### 3.5 **How to interpret Bayes Factor**

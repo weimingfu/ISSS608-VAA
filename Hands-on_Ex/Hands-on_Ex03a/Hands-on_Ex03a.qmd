@@ -233,7 +233,7 @@ Code chunk below shows the second interactive feature of ggiraph, namely `data_
 
 p <- ggplot(data = exam_data,
             aes(x = MATHS)) +
-  geom_dotplot_interactive(aes(data_id = CLASS),
+  geom_dotplot_interactive(aes(data_id = CLASS, tooltip = paste0("Class: ", CLASS)),
                            stackgroups = TRUE,
                            binwidth = 1,
                            method = "histodot") +
@@ -287,7 +287,7 @@ girafe(ggobj = p,
        )
 ```
 
-Note: Different from previous example, in this example the ccs customisation request are encoded directly.
+Note: Different from previous example, in this example the css customisation request are encoded directly.
 
 ```{r}
 #| echo: FALSE
@@ -396,7 +396,7 @@ Coordinated multiple views methods has been implemented in the data visualisatio
 p1 <- ggplot(data = exam_data,
              aes (x=MATHS)) +
   geom_dotplot_interactive(
-    aes(data_id = ID),
+    aes(data_id = ID, tooltip = ID),
     stackgroups = TRUE,
     binwidth = 1,
     method = "histodot") +
@@ -407,7 +407,7 @@ p1 <- ggplot(data = exam_data,
 p2 <- ggplot(data = exam_data,
              aes (x=ENGLISH)) +
   geom_dotplot_interactive(
-    aes(data_id = ID),
+    aes(data_id = ID, tooltip = ID),
     stackgroups = TRUE,
     binwidth = 1,
     method = "histodot") +
@@ -419,7 +419,7 @@ girafe(code = print(p1 + p2),
        width_svg = 6,
        height_svg = 3,
        options = list(
-         opts_hover(css = "fill: #202020;"),
+         opts_hover(css = "fill: #202204;"),
          opts_hover_inv(css = "opacity:0.2")
        ))
 ```
@@ -437,7 +437,7 @@ In order to build a coordinated multiple views as shown in the example above, th
 p1 <- ggplot(data = exam_data,
              aes (x=MATHS)) +
   geom_dotplot_interactive(
-    aes(data_id = ID),
+    aes(data_id = ID, tooltip = ID),
     stackgroups = TRUE,
     binwidth = 1,
     method = "histodot") +
@@ -448,7 +448,7 @@ p1 <- ggplot(data = exam_data,
 p2 <- ggplot(data = exam_data,
              aes (x=ENGLISH)) +
   geom_dotplot_interactive(
-    aes(data_id = ID),
+    aes(data_id = ID, tooltip = ID),
     stackgroups = TRUE,
     binwidth = 1,
     method = "histodot") +

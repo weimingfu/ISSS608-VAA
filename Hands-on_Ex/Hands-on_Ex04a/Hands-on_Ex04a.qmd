@@ -27,7 +27,7 @@ For the purpose of this exercise, the following R packages will be used, they ar
 
 ```{r}
 pacman::p_load(ggdist, ggridges, ggthemes,
-               colorspace, tidyverse)
+               colorspace, tidyverse, plotly, ggplot2, ggiraph)
 ```
 
 ### 2.2 Data Import
@@ -126,7 +126,7 @@ ggplot(exam,
   geom_density_ridges_gradient(
     scale=3,
     rel_min_height=0.01) +
-  scale_fill_viridis_c(name = "Temp. [F]",
+  scale_fill_viridis_c(name = "English Grades",
                        option = "C") +
   scale_x_continuous(
     name = "English grades",
@@ -427,7 +427,7 @@ Lastly, [`coord_flip()`](https://ggplot2.tidyverse.org/reference/coord_flip.htm
 ```{r}
 #| echo: false
 
-ggplot(exam,
+p <- ggplot(exam,
        aes(x=RACE,
            y=ENGLISH)) +
   stat_halfeye(adjust=0.5,
@@ -442,6 +442,8 @@ ggplot(exam,
             dotsize = 1.5) +
   coord_flip() +
   theme_economist()
+
+p
 ```
 
 ## The code chunk
@@ -456,8 +458,9 @@ ggplot(exam,
                justification=-0.2,
                .width=0,
                point_colour = NA) +
-  geom_boxplot(width = .20,
-               outlier.shape = NA) +
+  geom_boxplot_interactive(aes(tooltip = ENGLISH),
+                           width = .20,
+                           outlier.shape = NA) +
   stat_dots(side = "left",
             justification = 1.2,
             binwidth = .5,
@@ -466,3 +469,27 @@ ggplot(exam,
   theme_economist()
 ```
 :::
+
+Interactive version (Using ggiraph):
+
+```{r}
+library(see)
+
+interactive <- ggplot(exam, aes(x=RACE,
+           y=ENGLISH, color=RACE)) +
+    geom_violinhalf(position = position_nudge(x = .4, y = 0)) +
+    geom_boxplot_interactive(width = .10,
+                           outlier.shape = NA,
+                           position = position_nudge(x = .25, y = 0)) +
+    coord_flip(xlim = c(1.2, 4.3))+
+    geom_jitter_interactive(aes(color = RACE, tooltip = ENGLISH),
+                width=0.15, alpha = 0.6)+
+    theme_economist() +
+    theme(legend.position="none")
+
+girafe(
+  ggobj = interactive,
+  width_svg = 6,
+  height_svg = 6*0.618)
+
+```
