@@ -482,7 +482,7 @@ interactive <- ggplot(exam, aes(x=RACE,
                            outlier.shape = NA,
                            position = position_nudge(x = .25, y = 0)) +
     coord_flip(xlim = c(1.2, 4.3))+
-    geom_jitter_interactive(aes(color = RACE, tooltip = ENGLISH),
+    geom_jitter_interactive(aes(color = RACE, tooltip = paste0(ID, "\nScore: ", ENGLISH)),
                 width=0.15, alpha = 0.6)+
     theme_economist() +
     theme(legend.position="none")
