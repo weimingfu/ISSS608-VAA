@@ -1,0 +1,644 @@
+---
+title: "Be Weatherwise or Otherwise"
+subtitle: "Take-home Exercise 3"
+date: "February 18, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+editor: visual
+format:
+  html:
+    code-fold: true
+    code-tools:
+      source: false
+---
+
+# 1 Overview
+
+------------------------------------------------------------------------
+
+## 1.1 **Setting the scene**
+
+Singapore has undertaken three National Climate Change Studies to better understand the potential impact of climate change on the country. A report from the study documented the following findings on the possible impact of climate change in Singapore:
+
+-   Daily mean temperature are projected to increase by 1.4 to 4.6, and
+-   The contrast between the wet months (November to January) and dry month (February and June to September) is likely to be more pronounced.
+
+![](images/clipboard-257650865.png){fig-align="center"}
+
+## 1.2 The task
+
+In this take-home exercise, we will explore the impact of climate change on daily temperature, boxed-up in red in the diagram above, in Singapore by applying interactive techniques to enhance the user experience in data discovery and/or visual story-telling. In doing so, we will use visual interactivity and visualising uncertainty methods to validate these claims:
+
+-   From 1948 to 2016, annual mean temperatures rose at an average rate of 0.25℃ per decade
+-   Daily mean temperatures are projected to increase by 1.4℃ to 4.6℃
+
+## 1.3 **The Data**
+
+The data used in this study are the [historical daily temperature data](http://www.weather.gov.sg/climate-historical-daily/) obtained from the [Meteorological Service Singapore](http://www.weather.gov.sg/home/) website. The daily temperature records of the years 1983, 1993, 2003, 2013 and 2023 for **Changi weather station** are downloaded and used in this study to create an analytics-driven data visualisation.
+
+# 2 **Data Preparation**
+
+------------------------------------------------------------------------
+
+## 2.1 **Loading R packages**
+
+The `pacman::p_load()` function is used to install and load the required R packages into the R environment, as below.
+
+-   [tidyverse](https://www.tidyverse.org/): collection of R packages designed for data science
+-   [patchwork](https://cran.r-project.org/web/packages/patchwork/): an R package for preparing composite figure created using ggplot2
+-   [DT](https://cloud.r-project.org/web/packages/DT/): an R package to render interactive DataTables
+-   [plotly](https://plotly.com/r/): an R graphing library for plotting interactive, publication-quality graphs
+-   [ggiraph](https://cran.r-project.org/web/packages/ggiraph/index.html): an R library for creating interactive ggplot2 graphics using 'htmlwidgets
+-   [gifski](https://cran.r-project.org/web/packages/gifski/index.html): an R library for converting images to gif animations
+-   [gganimate](https://gganimate.com/): an R package that extends ggplot2 to include the description of animation
+-   [ggthemes](https://ggplot2.tidyverse.org/reference/ggtheme.html): an R package provides some extra themes, geoms, and scales for ‘ggplot2’
+-   [knitr](https://cran.r-project.org/web/packages/knitr/): an R package for dynamic report generation
+-   [ungeviz](https://www.rdocumentation.org/packages/ungeviz/versions/0.1.0/topics/ungeviz): an R package for visualizing uncertainty with ggplot2
+-   [manipulateWidget](https://cran.r-project.org/web/packages/htmlwidgets/index.html): A framework for creating HTML widgets that render in various contexts including the R console, 'R Markdown' documents, and 'Shiny' web applications.
+
+```{r}
+#| code-summary: "Show code"
+pacman::p_load(tidyverse, patchwork, DT, plotly, ggiraph, gifski, gganimate, ggthemes, knitr, ungeviz, crosstalk, manipulateWidget)
+```
+
+## 2.2 Importing data
+
+The code chunk below does the following:
+
+-   Use "list.files" to enumerate all the individual excel files which stores the daily temperature records in a month
+-   Use "Read.csv" is then used to read and concatenate all records from the individual files into a dataframe, while the relevant columns with the temperature records are selected
+-   Use mutate function to change data type of some columns and derive a Date field consisting of year, month, day
+
+```{r}
+#| code-summary: "Show code"
+colnames = c("Station",	"Year",	"Month",	"Day",	"Daily_Rainfall_mm",	"Highest_30_Min_Rainfall_mm",	"Highest_60_Min_Rainfall_mm",	"Highest_120_Min_Rainfall_mm",	"Mean_Temp_celcius",	"Max_Temp_celcius",	"Min_Temp_celcius", "Mean_Wind_Speed_km/h", "Max_Wind_Speed_km/h")
+
+weather_data <- list.files(path = "./data/", 
+                           pattern = "\\.csv$",
+                           full.names = T) %>% 
+  map_df(~read.csv(.,header = F, col.names=colnames)) %>% 
+  filter(grepl('Changi', Station)) %>% 
+  select(c("Station",	"Year",	"Month",	"Day", "Mean_Temp_celcius",	"Max_Temp_celcius",	"Min_Temp_celcius")) %>% 
+  mutate(Mean_Temp_celcius = as.numeric(Mean_Temp_celcius),
+         Max_Temp_celcius = as.numeric(Max_Temp_celcius),
+         Min_Temp_celcius = as.numeric(Min_Temp_celcius),
+         Year = factor(Year, levels = c('1983', '1993', '2003', '2013', '2023')),
+         Month = factor(Month, levels = 1:12),
+         Day = factor(Day, levels = 1:31),
+         Date = paste0(Year, '-', Month, '-', Day))
+
+```
+
+## 2.3 **Summary statistics of data**
+
+Below code chunks detail initial observations and summary statistics relating to the weather data.
+
+::: panel-tabset
+#### Data Preview
+
+```{r}
+#| code-summary: "Show code"
+kable(head(weather_data, 10))
+```
+
+#### Data Summary
+
+```{r}
+summary(weather_data)
+```
+
+#### Data Check
+
+Below code chunk shows no duplicate records found in dataset.
+
+```{r}
+#| code-summary: "Show code"
+weather_data[duplicated(weather_data),]
+```
+
+Below code chunk no missing values in dataset.
+
+```{r}
+#| code-summary: "Show code"
+sum(is.na(weather_data))
+```
+:::
+
+::: {.callout-tip icon="false"}
+#### Initial observations on dataset
+
+The dataset of Singapore students contains 1825 rows of records (365 records for each day of the 5 years) with 8 variables. A visual look at the overview of the data structure revealed the following:
+
+-   The records contains the daily mean, max and min temperatures. Further data wrangling to derive monthly and annual averages will be necessary for effective visualisations.
+-   No duplicates or missing values in the dataset.
+:::
+
+## 2.4 Choosing the Month for Analysis
+
+The code chunk below is used to find a suitable month for analysis, by computing the month with the highest daily mean temperature. From the results obtained below, the month of May is chosen for analysis.
+
+```{r}
+#| code-summary: "Show code"
+kable(head(weather_data %>% 
+  arrange(desc(Mean_Temp_celcius)),5))
+```
+
+# 3 Data Preparation
+
+------------------------------------------------------------------------
+
+Before the visualisations can be prepared, the daily values are aggregated to produce monthly and annual values.
+
+## 3.1 Data Wrangling
+
+### 3.1.1 Filtering
+
+The following code chunk is used to filter the records in May for further analysis.
+
+```{r}
+weather_data <- weather_data %>% 
+  filter(Month == 5)
+```
+
+### 3.1.2 Monthly Aggregates
+
+The following code chunk is used to compute the monthly average, maximum and minimum daily mean temperatures for each month of the 5 years used for analysis, and the result is stored in a new dataframe.
+
+```{r}
+#| code-summary: "Show code"
+weather_by_month <- weather_data %>% 
+  group_by(Year) %>% 
+  summarise(`Monthly Average` = round(mean(Mean_Temp_celcius),2),
+            max_monthly_temp = max(Max_Temp_celcius), 
+            min_monthly_temp = min(Min_Temp_celcius))
+```
+
+# 4 Analytics-Driven Data Visualisation
+
+------------------------------------------------------------------------
+
+The following analytical visualisations are prepared to enable data discovery, and to verify the claims on the impact of climate change on daily temperature in Singapore mentioned in the report.
+
+## 4.1 Static Data Visualisation
+
+The following code chunks are used to create a static data visualisation to display the following:
+
+1.  Daily mean temperature and daily temperature range over the 4 decades
+2.  Distribution of daily mean temperature
+3.  Changes in monthly average of daily mean temperature over the 4 decades
+4.  Uncertainty in using a point estimate, i.e. the monthly average, for analysis
+
+### 4.1.1 First sub-plot
+
+The first code chunk below produces the static plot for the plot of daily mean temperature and daily temperature range over the 5 years.
+
+```{r}
+#| warning: false
+#| code-summary: "Show code"
+p1s <- ggplot(data=weather_data,
+             aes(x=Mean_Temp_celcius,
+                 y=Max_Temp_celcius - Min_Temp_celcius,
+                 colour=Year)) +
+  geom_point(alpha=0.8,
+             size = 1.5,
+             show.legend = T) +
+  labs(x="Daily Mean Temp",
+       y="Daily Temp Range") +
+  ggtitle ("Daily Mean Temp vs \nDaily Temp Range") + 
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.key.size = unit(0.15, "cm"),
+        legend.text = element_text(size = 5),
+        title = element_text(size = 8),
+        axis.title = element_text(size = 6),
+        axis.text = element_text(size=5))
+```
+
+### 4.1.2 Second sub-plot
+
+The 2nd code chunk below produces the static plot for the plot of distribution of daily mean temperature.
+
+```{r}
+#| warning: false
+#| code-summary: "Show code"
+p2s <- ggplot(data = weather_data,
+             aes(x = Mean_Temp_celcius, fill = Year)) +
+  geom_dotplot(stackgroups=T,
+               binwidth=0.15,
+               method="histodot",
+               color = NA) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  labs(x = "Daily Mean Temp", 
+       title = "Stacked Plot of \nDaily Mean Temp") +
+  theme_bw() +
+  theme(legend.position = "none",
+        title = element_text(size = 8),
+        axis.title = element_text(size = 6),
+        axis.text = element_text(size=5))
+```
+
+### 4.1.3 Third sub-plot
+
+The 3rd code chunk below produces the static plot for the plot of changes in monthly average of daily mean temperature over the 5 years.
+
+```{r}
+#| warning: false
+#| code-summary: "Show code"
+
+#for labeling the plot
+dat_text <- data.frame(
+  label = c(paste0("Month Average: ", weather_by_month$`Monthly Average`[1]), 
+            paste0("Month Average: ", weather_by_month$`Monthly Average`[2]), 
+            paste0("Month Average: ", weather_by_month$`Monthly Average`[3]), 
+            paste0("Month Average: ", weather_by_month$`Monthly Average`[4]),
+            paste0("Month Average: ", weather_by_month$`Monthly Average`[5])),
+  Year = c(1983, 1993, 2003, 2013, 2023),
+  x = c(15.5, 15.5, 15.5, 15.5, 15.5),
+  y = c(weather_by_month$`Monthly Average`[1]-0.15, 
+        weather_by_month$`Monthly Average`[2]-0.15, 
+        weather_by_month$`Monthly Average`[3]-0.15, 
+        weather_by_month$`Monthly Average`[4]-0.15, 
+        weather_by_month$`Monthly Average`[5]-0.15),
+  clr = c("red", "black", "black", "black", "red")
+)
+
+p3s <- ggplot(data = weather_data) +
+  geom_hline(data = weather_by_month,
+             aes(yintercept = `Monthly Average`),
+             color = "black",
+             alpha = 1.0,
+             size = 0.4) +
+  geom_line(aes(x=Day,
+                y=Mean_Temp_celcius,
+                group = Year,
+                color = Year,
+                alpha = 0.6)) +
+  facet_grid(~Year) + 
+  labs(x = "Day in Month of May",
+       y = "Daily Mean Temp") +
+  ggtitle("Temparature change over 4 decades") +
+  theme_bw() +
+  theme(legend.position="none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 6),
+        title = element_text(size=10),
+        axis.text.y = element_text(size=5))
+
+p3s <- p3s +
+  geom_text(data = dat_text,
+            mapping = aes(x=x, y=y, label=label),
+            size = 2.5)
+```
+
+### 4.1.4 Fourth sub-plot
+
+The 4th code chunk below produces the static plot for the plot showing uncertainty in using a point estimate by displaying the 95% confidence interval of the records in May.
+
+```{r}
+#| warning: false
+#| code-summary: "Show code"
+
+# computes the statistical standard error
+weather_se <- weather_data %>% 
+  group_by(Year) %>% 
+  summarise(
+    n=n(),
+    mean=mean(Mean_Temp_celcius),
+    sd=sd(Mean_Temp_celcius)
+  ) %>% 
+  mutate(se=sd/sqrt(n-1))
+
+p4s <- ggplot(data = weather_se) +
+  geom_errorbar(aes(x=factor(Year),
+                    ymin=mean-1.96*se,
+                    ymax=mean+1.96*se),
+                width=0.4,
+                colour="black",
+                alpha=0.9,
+                size=1.4) + 
+  geom_point(aes(x=Year,
+                 y=mean),
+             stat = "identity",
+             color="red",
+             size=3.0,
+             alpha=1) +
+  xlab("Year") +
+  ylab("Average Daily Mean Temp") +
+  ggtitle("95% Confidence Interval of \n Daily Mean Temp") +
+  coord_flip() +
+  theme_bw() +
+  theme(title = element_text(size=8),
+        axis.title = element_text(size=6),
+        axis.text = element_text(size=5))
+```
+
+### 4.1.5 Combining all sub-plots
+
+The code chunk below combines all the above plots into a static data visualisation.
+
+```{r}
+#| warning: false
+#| code-summary: "Show code"
+p_comb_s1 <- p2s | p1s | p4s
+p3s / p_comb_s1 +
+  plot_layout(heights = c(3,2)) +
+  plot_annotation(title = "Has Daily Temperature Increased from 1983 - 2023?")
+```
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ::: {style="color: darkblue"}                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ![](images/methodology.png){width="40"} **DISCUSSION AND EXPLANATION**                                                                                                                                                                                                                                                                                                                                                                   |
+| :::                                                                                                                                                                                                                                                                                                                                                                                                                                      |
++==========================================================================================================================================================================================================================================================================================================================================================================================================================================+
+| The data visualisation above encompasses the following plots:                                                                                                                                                                                                                                                                                                                                                                            |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 1.  A facet grid plot (top row) which shows the daily mean temperatures in May in each of the 5 years used in the analysis, as well as a horizontal line that depicts the monthly average of the daily mean temperature (actual value is labelled on the plot since it is static). This plot was used as it allows one to visually compare the daily mean and the corresponding monthly average temperatures.                            |
+| 2.  A stacked dot plot is provided on the lower left corner to provide a visual view of the distribution of the daily mean temperature in May according to the different years used in the study. Different colored dots are used so that one can differentiate the temperature records belonging to the different years.                                                                                                                |
+| 3.  A scatter plot of daily mean temperature vs the daily temperature range is provided in the lower middle section, as it provides a visual view for one to assess visually if there is any relationship between rising daily mean temperature and the daily temperature range. This serves to provide insights into whether the increase in temperature could be due to greater variability in daily temperatures.                     |
+| 4.  An error bar plot in the lower right corner shows the 95% confidence interval of the monthly average temperature, which was estimated using the daily mean temperatures in May. The inclusion of the error bar plot is allow one to quickly tell if the standard error associated with using a point estimate had changed over the decades, and how this might have impacted the analysis of the increase in daily mean temperature. |
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ::: {style="color: darkgreen"}                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ![](images/solution.png){width="40"} INSIGHTS                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| :::                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
++====================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
+| Using the above animated plot, the following initial insights were derived:                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 1.  Daily mean temperatures had generally trended higher over the period 1983 to 2023, as seen from the increase in monthly average daily mean temperature, as well as the observation that there were more days in 2023 with relatively higher daily mean temperature than the earlier decades. The increase of daily mean temperature using data for May from 1983-2023 showed an increase of approximately 1.2℃, i.e. an increase of **0.3℃ per decade** over the 4 decades used in this study. |
+| 2.  While daily mean temperatures had increased, variability in daily mean temperature had remained relatively the same over the 4 decades. This implies that the higher temperatures were not due to higher variability in daily mean temperature.                                                                                                                                                                                                                                                |
+| 3.  From the error bar plot, it can be deduced that the standard error had some variability over the 4 decades, though the variation did not appear to be large. However, suitable interactivity needs to be added to the plot for it to be more useful for analysis purposes.                                                                                                                                                                                                                     |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ::: {style="color: red"}                                                                                                                                                                                                                                                                                                                                                 |
+| ![](images/problem.png){width="40"} DRAWBACKS                                                                                                                                                                                                                                                                                                                            |
+| :::                                                                                                                                                                                                                                                                                                                                                                      |
++==========================================================================================================================================================================================================================================================================================================================================================================+
+| Some drawbacks of using a static data visualisation for visual storytelling in this case includes:                                                                                                                                                                                                                                                                       |
+|                                                                                                                                                                                                                                                                                                                                                                          |
+| 1.  **Limited amount of details can be shown on the data visualisation**, e.g. the cycle plot could only indicate the monthly average value, but the values of the daily mean temperature can only be estimated by looking at the axes.                                                                                                                                  |
+| 2.  Use of different colors for the dot plot and scatter plot may not be the best way to segregate the values associated with different years, especially if there is **significant overlap** (for the case of the scatter plot). Moreover, a static data visualisation does not allow the user to obtain accurate details from the visualisation apart from estimation. |
+| 3.  **Unable to easily tell how the data points changes over time**. Though the facet grid allows for such a comparison, it may not be so effective for one to have to visually compare across sub-plots that are placed besides one another.                                                                                                                            |
+| 4.  Similar to other plots, **a static error bar plot does not allow more precise details**, e.g. the confidence interval and the monthly average value, **to be provided to the user**.                                                                                                                                                                                 |
+|                                                                                                                                                                                                                                                                                                                                                                          |
+| Nothwithstanding the above drawbacks, a static data visualisation can be a quick and effective method for visualisation if the questions that needed to be answered is straightforward, and thus user interaction is not critical.                                                                                                                                       |
+|                                                                                                                                                                                                                                                                                                                                                                          |
+| We will next set out to perform makeover on the static plot, so as to improve upon the user interactivity and allow the user to use the data visualisation to form his/her own insights and assessment.                                                                                                                                                                  |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+## 4.2 Interactivity Makeover of Data Visualisation
+
+The following code chunks are used to create an interactive data visualisation makeover to improve upon the user interactivity:
+
+1.  Daily mean temperature and daily temperature range over the 4 decades
+    -   Use of animation to provide a visual representation of how the daily mean temperature changes over the 4 decades
+    -   Tooltip also used to display information on the selected day's temperature
+    -   Supports brushing, allowing the user to filter and zoom in on selected data points
+2.  Distribution of daily mean temperature
+    -   Use of data-ID that allows user to hover over and view all temperature record of the same year
+3.  Changes in monthly average of daily mean temperature over the 4 decades
+    -   Use of tooltips to display the daily mean temperature on the line chart, as well as the monthly average (geom_hline)
+    -   Supports brushing, allowing the user to filter and zoom in on selected data points
+4.  Uncertainty in using a point estimate, i.e. the monthly average, for analysis
+    -   Use of tooltip to show information on monthly average and the standard error at 95% confidence interval
+
+### 4.2.1 Interactive Makeover of First sub-plot
+
+The code chunk below produces the interactive plot for the plot of daily mean temperature and daily temperature range over the 5 years.
+
+```{r}
+#| warning: false
+#| code-summary: "Show code"
+
+p1i <- ggplot(data=weather_data,
+             aes(x=Mean_Temp_celcius,
+                 y=Max_Temp_celcius - Min_Temp_celcius,
+                 colour=Year,
+                 text = paste0('Date: ', Date, '\n',
+                               'Daily Mean Temp: ', Mean_Temp_celcius, '℃\n',
+                               'Daily Temp Range: ', Max_Temp_celcius - Min_Temp_celcius, "℃"))) +
+  geom_point(aes(frame = Year),
+             alpha=0.8,
+             show.legend = F) +
+  labs(x="Daily Mean Temp (℃)",
+       y="Daily Temp Range (℃)") + 
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 6),
+        axis.text = element_text(size=5))
+  
+p1i <- ggplotly(p1i, tooltip = "text") %>% 
+  layout(title = list(text = "Daily Mean vs Daily Range"),
+         titlefont = list(size = 10)) %>% 
+  animation_slider(
+    font = list(size=6),
+    currentvalue = list(visible = FALSE)
+  ) %>% 
+  animation_button(
+    font = list(size=6),
+    button = list(height=10)
+  ) %>% 
+  animation_opts(frame=2000,
+                 transition = 1000)
+```
+
+### 4.2.2 Interactive Makeover of Second sub-plot
+
+The code chunk below produces the interactive plot for the plot of distribution of daily mean temperature.
+
+```{r}
+#| warning: false
+#| code-summary: "Show code"
+p2i <- ggplot(data = weather_data,
+             aes(x = Mean_Temp_celcius)) +
+  geom_dotplot_interactive(aes(data_id=Year,
+                               tooltip=paste0("Year: ", Year)),
+                           stackgroups=T,
+                           binwidth=0.15,
+                           method="histodot",
+                           fill = "blue",
+                           color = NA) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  labs(x = "Daily Mean Temp (℃) ",
+       y = "") +
+  ggtitle("Stacked Plot of Daily Mean Temp") +
+  theme_bw() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 16),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size=5))
+
+p2i <- girafe(ggobj = p2i,
+       width_svg = 5,
+       height_svg = 4,
+       options=list(
+         opts_hover(css = "fill: #202020;"),
+         opts_hover_inv(css = "opacity:0.2")
+       )
+)
+```
+
+### 4.2.3 Interactive Makeover of Third sub-plot
+
+The code chunk below produces the interactive plot of changes in monthly average of daily mean temperature over the 5 years.
+
+```{r}
+#| warning: false
+#| code-summary: "Show code"
+p3i <- ggplot(data = weather_data) +
+  geom_hline(data = weather_by_month,
+             aes(yintercept = `Monthly Average`),
+             color = "black",
+             alpha = 0.8,
+             size = 0.4) +
+  geom_line(aes(group = Year,
+                x=Day,
+                y=Mean_Temp_celcius,
+                color = Year)) +
+  facet_grid(~Year) + 
+  labs(x = "Month in Year",
+       y = "Daily Mean Temp (℃ )") +
+  ggtitle("Temparature change over 4 decades") +
+  theme_bw() +
+  theme(legend.position="none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 6),
+        title = element_text(size=10),
+        axis.text.y = element_text(size=5))
+
+p3i <- ggplotly(p3i)
+
+```
+
+### 4.2.4 Interactive Makeover of Fourth sub-plot
+
+The code chunk below produces the interactive plot for the plot showing uncertainty in using a point estimate by displaying the 95% confidence interval of the records in May.
+
+```{r}
+#| warning: false
+#| code-summary: "Show code"
+p4i <- ggplot(weather_se) +
+  geom_errorbar(aes(x=factor(Year),
+                ymin=mean-1.96*se,
+                ymax=mean+1.96*se),
+                width=0.05,
+                colour="black",
+                alpha=0.9,
+                size=1.4) + 
+  geom_point(aes(x=Year,
+                 y=mean,
+                 text=paste("Year:", `Year`, "<br>N:", `n`,
+                            "<br>Avg. Daily Mean Temp (℃):", round (mean, digits=2),
+                            "<br>95% CI:[", round((mean-1.96*se), digits=2), 
+                            ",", round((mean+1.96*se), digits=2), "]")),
+             stat = "identity",
+             color="red",
+             size=3.0,
+             alpha=1) +
+  xlab("Year") +
+  ylab("Average Daily Mean Temp (℃)") +
+  ggtitle("95% Confidence Interval \nof Daily Mean Temp") +
+  coord_flip() +
+  theme_bw() +
+  theme(axis.title = element_text(size=6),
+        plot.title = element_text(size=8),
+        axis.text = element_text(size=5))
+
+p4i <- ggplotly(p4i, tooltip = "text")
+```
+
+4.2.5 Combining all Interactive sub-plots
+
+The code chunk below combines all the above plots into an interactive data visualisation.
+
+```{r}
+#| warning: false
+#| code-summary: "Show code"
+combineWidgets(p3i,
+               combineWidgets(p2i,
+                              p1i,
+                              p4i,
+                              nrow = 1,
+                              ncol = 3,
+                              width = 600,
+                              height = 180),
+               nrow=2,
+               ncol=1,
+               title = "Has Daily Temperature Increased from 1983 - 2023?",
+               width=600,
+               height=450)
+```
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ::: {style="color: darkblue"}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ![](images/methodology-01.png){width="40"} DISCUSSIONS ON IMPROVEMENTS MADE                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| :::                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
++============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
+| The folllowing improvements were made to the static data visualisation in 4.1.                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 1.  A **cycle plot** showing the daily mean temperature by year was used to visualise how the daily averages change over the decades.                                                                                                                                                                                                                                                                                                                                                                                      |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|     -   The **interactivity** of the plot allows the user to conveniently **obtain the daily average by hovering** over the line chart.                                                                                                                                                                                                                                                                                                                                                                                    |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 2.  A **horizontal y-intercept line** with the monthly average of daily mean temperature as its value was used to compare the monthly mean temperatures over the 4 decades.                                                                                                                                                                                                                                                                                                                                                |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|     -   This allows the user to, at one glance, **see how the monthly averages had changed over the decades**, and be able to quickly tell which year is the highest and which is the lowest.                                                                                                                                                                                                                                                                                                                              |
+|     -   Interactivity is added as the **monthly average value will be provided to the user when hovered over**, instead of statically 'hardcoding' the value on the plots.                                                                                                                                                                                                                                                                                                                                                 |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 3.  An **interactive** **stacked dotplot** was used to display the distribution of daily mean temperature of all days in the 5 years used for this analysis.                                                                                                                                                                                                                                                                                                                                                               |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|     -   Provides a **simple and easy-to-interact-with** plot for the user to have a visual overview of the distribution of daily mean temperature over all 5 years used in the study, while also allowing for a **detailed look at each year's distribution by hovering over the "dots"**. When hovered over, the **plot will highlight all the data points within the same year**, allowing the user to have a good visual view of how the daily mean temperature of that year is distributed as compared to other years. |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 4.  An **animated scatter plot** showing the daily mean temperatures against daily temperature range allows the user to have a good visual overview of the spread of the daily mean temperatures and the daily temperature range over the 4 decades and interact with it.                                                                                                                                                                                                                                                  |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|     -   The animated plot used the "Year" to run the frames so that the **points will not be overly-cluttered**, while allowing the user to **visually observe the movement of the points on the plot over the 4 decades**, i.e. he would be able to have an sense of whether the daily mean temperature had generally increased or decreased over the years, while having the flexibility to stop at any of the years if he wish to take a more in-depth look.                                                            |
+|     -   The **tooltip provides useful information** of the date, daily mean temperature and daily temperature range when hovered over, allowing the user to have good access to the actual records.                                                                                                                                                                                                                                                                                                                        |
+|     -   The animated plot also supports **brushing**, thus allowing the user to narrow down and play the animation on specific temperature ranges , e.g. looking at high temperatures only.                                                                                                                                                                                                                                                                                                                                |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 5.  An **error bar plot** was used to visualise the uncertainty involved in point estimates, i.e. monthly average of daily mean temperature, which will be useful in deriving a range of temperature increase at a certain confidence level (we used 95% here)                                                                                                                                                                                                                                                             |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|     -   Provides a simple view of the confidence interval of the point estimate for each year's temperature data, and also allows the user to do a quick comparison of the point estimate (i.e. monthly average of daily mean temperature)                                                                                                                                                                                                                                                                                 |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|     -   **Tooltip to provide useful information** on mean value and confidence interval range.                                                                                                                                                                                                                                                                                                                                                                                                                             |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ::: {style="color: darkgreen"}                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ![](images/solution-01.png){width="40"} INSIGHTS                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| :::                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
++==============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
+| Using the above animated plot, the following insights were derived:                                                                                                                                                                                                                                                                                                                                                                                                                          |
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| 1.  **Daily mean temperatures had generally trended higher** over the period 1983 to 2023, as there are more data points with daily mean temperature higher than 29℃ in 2023, while the variation in daily temperatures had remained largely the same.                                                                                                                                                                                                                                       |
+| 2.  Using May's average of daily mean temperature as an estimate for the change in daily temperature, **May's average had risen by 1.2℃ from 1983 to 2023**, which works out to be **an increase of 0.3℃ per decade** over 4 decades, which is quite close to what was claimed in the report. A caveat to this is that this study had only used data for May, and the actual increase in annual mean temperature could be affected by other months if they are different from that in May.   |
+| 3.  **2023 saw more months with higher monthly average of daily mean temperature as compared to the earlier decades**, which possibly explains for the higher annual average. Specifically, there were more days with mean temperature above 29℃ in 2023 as compared to the earlier 4 decades. Similarly, 2023 had lesser days with low daily mean temperatures (below 27℃) as well. Also, 1993 saw the lowest annual average of daily mean temperature, while the highest was seen in 2023. |
+| 4.  However, as daily temperatures varies quite widely in all of the 5 years, it would not be possible to conclude that temperatures had risen just by looking at the distribution plot. Specifically, the analyst will **also need to consider the uncertainty and variability of the daily mean temperature**.                                                                                                                                                                             |
+| 5.  Using the 95% confidence interval ranges obtained for May's average daily mean temperature over the 4 decades, t**he range of increase in May's average temperature was \[0.64℃, 1.75℃\]**, which works out to be **a range of \[0.16℃, 0.44℃\] per decade**.                                                                                                                                                                                                                            |
+|     -   Using this range to do a simple extrapolation until the end of this century, i.e. approx 8 decades away, **the range of temperature increase at 95% confidence interval (based on May's weather records) is \[1.28℃, 3.52℃\]**, which is quite close to, but lower than, the projected rise in daily mean temperature mentioned in the report.                                                                                                                                       |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+# **5 Conclusion**
+
+Visual interactivity and visualising uncertainty methods were used to validate these claims:
+
+-   From 1948 to 2016, annual mean temperatures rose at an average rate of 0.25℃ per decade
+-   Daily mean temperatures are projected to increase by 1.4℃ to 4.6℃
+
+From the analytics-driven data visualisations prepared, the analysis pertaining to the claims above are as follows:
+
+-   **From 1983 to 2023, annual mean temperatures increased at an average of 0.3℃ per decade** based in the analysis on daily mean temperature for the month of May, which is similar to that stated in the report for the period 1948 to 2016. However, as the 2 periods used are not exactly the same, and because we are only using one month of data for a single weather station in our analysis, the result obtained could be different if the data used is increased. Hence, though the analysis seemingly tallied with the first claim in terms of the magnitude of increase per decade, a full and accurate verification of the claim will require the use of more data over a longer period.
+-   The second claim stated that daily mean temperatures are projected to increase by 1.4℃ to 4.6℃ by end of the century, which amounts to an increase of approximately 0.2℃ to 0.66℃ per decade. **The observation from Changi weather station, i.e. an increase of annual mean temperature by 0.3℃ per decade, seemed to support this claim**, though as explained earlier, this could be moderated by the data from other stations.
+-   **Upon the analysis of the uncertainty associated with using a point estimate, i.e. May's average of the daily mean temperature, we were able to obtain an 95% confidence interval of projected increase in average temperature of 1.28℃ to 3.52℃**, which is lower than that projected in the report. Intuitively, a smaller interval would be expected when analysing a month's temperature records as opposed to an entire year, as the daily mean temperature would vary more over the year than any month.
+
+Further analysis techniques such as time series projection or statistical analysis can be performed to analyse and confirm the insights obtained.
+
+# **6 References**
+
+-   <https://www.nccs.gov.sg/singapores-climate-action/impact-of-climate-change-in-singapore/>
+-   <https://medium.com/hci-design-at-uw/hypothetical-outcomes-plots-experiencing-the-uncertain-b9ea60d7c740>
