@@ -5,7 +5,9 @@ date-modified: "last-modified"
 execute:
   eval: true
   echo: true
+  freeze: true
   warning: false
+  message: false
 editor: visual
 ---
 
@@ -316,7 +318,7 @@ Import the rice data set into R environment by using the code chunk below.
 rice <- read_csv("data/rice.csv")
 ```
 
-### 5.2  **Step 2: Plotting the slopegraph**
+### 5.2 **Step 2: Plotting the slopegraph**
 
 Next, code chunk below will be used to plot a basic slopegraph as shown below.
 

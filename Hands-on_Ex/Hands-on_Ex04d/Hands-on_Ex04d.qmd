@@ -5,7 +5,9 @@ date-modified: "last-modified"
 execute:
   eval: true
   echo: true
+  freeze: true
   warning: false
+  message: false
 editor: visual
 ---
 
@@ -67,8 +69,7 @@ funnel_plot(
 )
 ```
 
-A funnel plot object with 267 points of which 0 are outliers.
-Plot is adjusted for overdispersion.
+A funnel plot object with 267 points of which 0 are outliers. Plot is adjusted for overdispersion.
 
 Things to learn from the code chunk above.
 
@@ -217,7 +218,7 @@ fp_ggplotly <- ggplotly(p,
 fp_ggplotly
 ```
 
-## 6 References 
+## 6 References
 
 -   [funnelPlotR](https://nhs-r-community.github.io/FunnelPlotR/) package.
 

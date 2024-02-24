@@ -1040,7 +1040,7 @@
     "href": "index.html",
     "title": "Set Sail into the Adventures of ISSS608-VAA",
     "section": "",
-    "text": "Welcome to ISSS608 Visual Analytics and Applications. In this website, you will find the “expeditions” which I have experienced for this course.\n\n“The greatest value of a picture is when it forces us to notice what we never expected to see.” -John Tukey\n\n\n\n\n\n\n\nSee my latest destinations……\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nHands-on Exercise 7c\n\n\n\n\n\n\n\n\n\nFeb 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nHands-on Exercise 7a\n\n\n\n\n\n\n\n\n\nFeb 18, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nHands-on Exercise 7b\n\n\n\n\n\n\n\n\n\nFeb 18, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nBe Weatherwise or Otherwise\n\n\n\n\n\n\n\n\n\nFeb 18, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nHands-on Exercise 6\n\n\n\n\n\n\n\n\n\nFeb 14, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nHands-on Exercise 5e\n\n\n\n\n\n\n\n\n\nFeb 5, 2024\n\n\n\n\n\n\n\n\nNo matching items\n\n\n  \n\n Back to top"
+    "text": "Welcome to ISSS608 Visual Analytics and Applications. In this website, you will find the “expeditions” which I have experienced for this course.\n\n“The greatest value of a picture is when it forces us to notice what we never expected to see.” -John Tukey\n\n\n\n\n\n\n\nSee my latest destinations……\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nHorizon Plot - In-class Exercise 6\n\n\n\n\n\n\nFu Weiming\n\n\nFeb 24, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nHands-on Exercise 7c\n\n\n\n\n\n\n\n\n\nFeb 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nHands-on Exercise 7a\n\n\n\n\n\n\n\n\n\nFeb 18, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nHands-on Exercise 7b\n\n\n\n\n\n\n\n\n\nFeb 18, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nBe Weatherwise or Otherwise\n\n\n\n\n\n\n\n\n\nFeb 18, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nHands-on Exercise 6\n\n\n\n\n\n\n\n\n\nFeb 14, 2024\n\n\n\n\n\n\n\n\nNo matching items\n\n\n  \n\n Back to top"
   },
   {
     "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html",
@@ -1104,5 +1104,40 @@
     "title": "DataViz Makeover of Take-Home Exercise 1",
     "section": "3.4 Makeover 4: Performance and Socioeconomic Status",
     "text": "3.4 Makeover 4: Performance and Socioeconomic Status\nFor this makeover, the original focused more on the Math performance, hence I have used the Math performance for my makeover too.\n\n3.4.1 Original DataViz\n\n\n\n\n\n\n\n3.4.2 Critique\nThe critique is similar to that in 3.3 as the plots used are similar.\n\n\n\n\n\n\nClarity\n\n💚 Individually, both the box plot and the density distribution of the Math score by socioeconomic status are clear in showing the data.\n❌ However, they 2 plots are plotted separately. A better plot would be one where the boxplot is placed below the density curve, such as that of the raincloud plot.\n❌ Does not have a title and subtitle to provide context and/or insights derived from the visualisation.\n❌ The axes of the 2 plots are switched, hence making them more difficult to be compared visually.\n\n\n\nAesthetics\n\n💚 Overall, the individual plots are neat and the information is shown in clear fonts and font sizes.\n❌ x-axis ticks on the boxplot is redundant since x is a categorical variable.\n❌ The colours used in both plots are different, though there is not much reason for them to be different since both plots are referirng to the school type.\n❌ y-axis titles can be flipped for better readability.\n❌ Use of different themes for both plots makes the overall look and feel somewhat disjointed.\n\n\n\n\n\n\n3.4.3 Sketch of Makeover design\n\n\n\n\n\n\n\n3.4.4 Makeover DataViz\nThe code chunk below was used to provide the DataViz makeover to address the above critique:\n\n\nCode\nstu_viz4 &lt;- stu_qqq_SG_final %&gt;% \n  select(c(\"STUDENT_ID\", \"MATH\", \"SOCIOECONOMIC_STATUS\"))\n\npal &lt;- c(\"#FF8C00\", \"#A034F0\", \"#159090\", \"red\")\n\nggplot(stu_viz4,\n       aes(x=SOCIOECONOMIC_STATUS,\n           y=MATH)) +\n  stat_halfeye(aes(color=SOCIOECONOMIC_STATUS, \n                   fill=after_scale(colorspace::lighten(color, .3))),\n               adjust=0.5,\n               justification=-0.3,\n               .width=0,\n               point_colour = NA,\n               scale=0.7,\n               alpha = 0.4) +\n  geom_boxplot(width=.1,\n               outlier.alpha = 0.4,\n               outlier.color = \"blue\") +\n  scale_color_manual(values = pal, guide = \"none\") +\n  scale_fill_manual(values = pal, guide = \"none\") +\n  labs(y=\"Math score\") +\n  coord_flip() +\n  theme_minimal() +\n  theme(axis.title.y = element_blank(),\n        axis.title.x = element_text(color = \"grey30\")) +\n  plot_annotation(title = \"Students with better socioeconomic status achieve better performance\", subtitle = \"Results show relatively big difference between upper and lower tiers of socioeconomic status\")\n\n\n\n\n\nImprovements from the makeover:\nClarity:\n\nCombined the density curve and the boxplot on the same plot for easier comparisons, but did not choose the full raincloud plot (since the dot plot is not included) so that the plot will not be too cluttered.\nTitle and subtitle used to provide meaningful context for the plot, so that the audience can better make their own interpretations and form their own insights.\nSynchronised the y- and x-axis for all the plots for easier visual comparisons.\n\nAesthetics:\n\nSynchronised the x-axis for easier comparisons.\nNumber of gridlines are reduced and ink reduced as well, so that they do not interfere too much with the important details on the plot."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex06/In-class_Ex06.html",
+    "href": "In-class_Ex/In-class_Ex06/In-class_Ex06.html",
+    "title": "Horizon Plot - In-class Exercise 6",
+    "section": "",
+    "text": "Before getting start, make sure that ggHoriPlot has been included in the pacman::p_load(...) statement above.\n\npacman::p_load(ggHoriPlot, ggthemes, tidyverse)\n\n\n\n\n\naverp &lt;- read_csv(\"data/AVERP.csv\") %&gt;% \n  mutate(`Date` = dmy(`Date`))\n\n\n\n\n\naverp %&gt;% \n  filter(Date &gt;= \"2018-01-01\") %&gt;%\n  ggplot() +\n  geom_horizon(aes(x = Date, y=Values), \n               origin = \"midpoint\", \n               horizonscale = 6)+\n  facet_grid(`Consumer Items`~.) +\n    theme_few() +\n  scale_fill_hcl(palette = 'RdBu') +\n  theme(panel.spacing.y=unit(0, \"lines\"), strip.text.y = element_text(\n    size = 5, angle = 0, hjust = 0),\n    legend.position = 'none',\n    axis.text.y = element_blank(),\n    axis.text.x = element_text(size=7),\n    axis.title.y = element_blank(),\n    axis.title.x = element_blank(),\n    axis.ticks.y = element_blank(),\n    panel.border = element_blank()\n    ) +\n    scale_x_date(expand=c(0,0), date_breaks = \"3 month\", date_labels = \"%b%y\") +\n  ggtitle('Average Retail Prices of Selected Consumer Items (Jan 2018 to Dec 2022)')"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#getting-started",
+    "href": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#getting-started",
+    "title": "Horizon Plot - In-class Exercise 6",
+    "section": "",
+    "text": "Before getting start, make sure that ggHoriPlot has been included in the pacman::p_load(...) statement above.\n\npacman::p_load(ggHoriPlot, ggthemes, tidyverse)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#step-1-data-import",
+    "href": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#step-1-data-import",
+    "title": "Horizon Plot - In-class Exercise 6",
+    "section": "",
+    "text": "averp &lt;- read_csv(\"data/AVERP.csv\") %&gt;% \n  mutate(`Date` = dmy(`Date`))"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#data-import",
+    "href": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#data-import",
+    "title": "Horizon Plot - In-class Exercise 6",
+    "section": "",
+    "text": "averp &lt;- read_csv(\"data/AVERP.csv\") %&gt;% \n  mutate(`Date` = dmy(`Date`))"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#plotting-the-horizon-graph",
+    "href": "In-class_Ex/In-class_Ex06/In-class_Ex06.html#plotting-the-horizon-graph",
+    "title": "Horizon Plot - In-class Exercise 6",
+    "section": "",
+    "text": "averp %&gt;% \n  filter(Date &gt;= \"2018-01-01\") %&gt;%\n  ggplot() +\n  geom_horizon(aes(x = Date, y=Values), \n               origin = \"midpoint\", \n               horizonscale = 6)+\n  facet_grid(`Consumer Items`~.) +\n    theme_few() +\n  scale_fill_hcl(palette = 'RdBu') +\n  theme(panel.spacing.y=unit(0, \"lines\"), strip.text.y = element_text(\n    size = 5, angle = 0, hjust = 0),\n    legend.position = 'none',\n    axis.text.y = element_blank(),\n    axis.text.x = element_text(size=7),\n    axis.title.y = element_blank(),\n    axis.title.x = element_blank(),\n    axis.ticks.y = element_blank(),\n    panel.border = element_blank()\n    ) +\n    scale_x_date(expand=c(0,0), date_breaks = \"3 month\", date_labels = \"%b%y\") +\n  ggtitle('Average Retail Prices of Selected Consumer Items (Jan 2018 to Dec 2022)')"
   }
 ]

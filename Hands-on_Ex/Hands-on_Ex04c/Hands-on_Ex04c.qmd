@@ -5,7 +5,9 @@ date-modified: "last-modified"
 execute:
   eval: true
   echo: true
+  freeze: true
   warning: false
+  message: false
 editor: visual
 ---
 
@@ -363,7 +365,7 @@ exam %>%
        subtitle="Median Point + Multiple-interval plot")
 ```
 
-### 4.2  **Visualizing the uncertainty of point estimates: ggdist methods**
+### 4.2 **Visualizing the uncertainty of point estimates: ggdist methods**
 
 ::: callout-note
 #### Makeover
