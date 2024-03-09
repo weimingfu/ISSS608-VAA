@@ -1,11 +1,5 @@
 ---
 title: "Set Sail into the Adventures of ISSS608-VAA"
-
-listing:
-  contents: "*.qmd"
-  type: grid
-  sort: "date desc"
-  max-items: 6
 ---
 
 Welcome to **ISSS608 Visual Analytics and Applications**. In this website, you will find the "expeditions" which I have experienced for this course.
@@ -13,7 +7,3 @@ Welcome to **ISSS608 Visual Analytics and Applications**. In this website, you w
 > *“The greatest value of a picture is when it forces us to notice what we never expected to see.” -[John Tukey](http://www-history.mcs.st-and.ac.uk/Biographies/Tukey.html)*
 
 ![](images/picture1.jpeg){fig-align="center"}
-
-# See my latest destinations......
-
-------------------------------------------------------------------------

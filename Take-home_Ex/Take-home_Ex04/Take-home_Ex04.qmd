@@ -1,0 +1,1087 @@
+---
+title: "Prototyping Modules for Visual Analytics Shiny Application"
+subtitle: "Take-home Exercise 4"
+author: "Fu Weiming"
+date: "March 9, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  freeze: true
+  warning: false
+  message: false
+editor: visual
+format:
+  html:
+    code-fold: true
+    code-tools:
+      source: false
+---
+
+# 1 Overview
+
+------------------------------------------------------------------------
+
+## 1.1 Setting the scene
+
+This exercise serves as a prototype for one of the modules, i.e. the nowcasting / forecasting models, used in the group's proposed Shiny application for the Visual Analytics Project. Prototyping of the Shiny App has the following benefits:
+
+-   Validate the feasibility and effectiveness of your ideas or analytical approaches
+-   Gather feedback from stakeholders or end-users early in the development process
+-   Iteratively update the prototype, adding new features, improving usability, and refining visualizations until the desired outcome is achieved
+-   Facilitates collaboration among team members or stakeholders
+-   Identify and address potential issues early in the development process
+
+## 1.2 The task
+
+As part of this prototyping exercise, the following objectives are fulfilled:
+
+-   Identified and evaluated the necessary R packages in R CRAN
+-   Prepared and tested the R codes for the models
+-   Determined the parameters and outputs that will be exposed on the Shiny applications
+-   Selected the appropriate Shiny UI components for exposing the parameters
+
+## 1.3 Problem statement of group project
+
+Forecasting Singapore’s private housing index is beset with difficulties, arising from the complex interplay among several factors such as economic indicators, employment trends, policy changes, and current market sentiments. The intricacy is further intensified by the delayed nature of crucial indices and indicators, which are commonly released with a substantial time delay, usually spanning from one to three months. These delays impede the capacity to accurately predict private house price changes, as the most up-to-date data required for precise forecasts is not easily accessible.
+
+To tackle this problem, it is necessary to utlilise nowcasting models that can precisely forecast the future direction of the Singapore private housing market. The objective is to utilize these models to provide stakeholders, including homebuyers, sellers, investors, and policy makers, with timely and convenient access to predictive data via visual analytics.
+
+## 1.4 The Data
+
+This study will utilize datasets obtained from official government portals and CEIC, encompassing a range of economic indicators:
+
+-   **Singapore Private Residential Property Price Index**: A quarterly index tracking changes from March 1975 to June 2023.
+-   **Singapore Domestic Interest Rates**: The daily SORA Index data spanning from Jul 2005 to January 2024.
+-   **Straits Times Index (STI)**: Daily STI values from April 1985 to January 2024, reflecting stock market trends.
+-   **Prices of Raw Materials**: Monthly indices for cement, steel bars, granite, concreting sand, and ready-mixed concrete, providing insight into construction cost dynamics.
+-   **Unemployment Rate**: Quarterly data on the percentage of unemployed individuals from March 1992 to December 2023, offering a measure of labor market health.
+
+As SORA rates are only available from Jul 2005 onwards, the period of analysis and modelling of the private residential property price index will be done from 2005 onwards, since we expect interest rates to have an impact on the price index.
+
+# 2 Data Preparation
+
+------------------------------------------------------------------------
+
+## 2.1 **Loading R packages**
+
+The `pacman::p_load()` function is used to install and load the required R packages into the R environment, as below.
+
+-   [tidyverse](https://www.tidyverse.org/): collection of R packages designed for data science
+-   [randomForest](https://cran.r-project.org/web/packages/randomForest/): an R library for classification and regression based on a forest of trees using random inputs
+-   [plotly](https://plotly.com/r/): an R graphing library for plotting interactive, publication-quality graphs
+-   [gbm](https://cran.r-project.org/web/packages/gbm/): an R library for Freund and Schapire's AdaBoost algorithm and Friedman's gradient boosting machine
+-   [prophet](https://cran.r-project.org/web/packages/prophet/index.html): an R library that implements a procedure for forecasting time series data based on an additive model developed by Facebook
+-   [knitr](https://cran.r-project.org/web/packages/knitr/): an R package for dynamic report generation
+-   [patchwork](https://cran.r-project.org/web/packages/patchwork/): an R package for preparing composite figure created using ggplot2
+
+```{r}
+#| code-summary: "Show code"
+pacman::p_load(tidyverse, randomForest, plotly, gbm, prophet, knitr, patchwork)
+```
+
+## 2.2 Importing data
+
+The following code chunks uses read_csv to read the time series values of the different datasets listed in 1.4.
+
+```{r}
+#| code-summary: "Show code"
+ppi <- read_csv('data/PPI_private_housing.csv') %>% 
+  setNames(c('Date', 'PR_All', 'PR_Landed', 'PR_NL_ALL', 'PR_NL_CCR', 'PR_NL_RCR', 'PR_NL_OCR')) %>%
+  mutate(Date = as.Date(Date, format = '%d/%m/%Y')) %>% 
+  mutate(Month = month(Date)) %>% 
+  mutate(Date = year(Date)) %>% 
+  rename(Year = Date) %>% 
+  mutate(Year = as.factor(Year))
+
+material_price <- read_csv('data/Construction Materials prices.csv') %>% 
+  setNames(c('Date', 'Cement', 'SteelBar', 'Granite', 'ConcretingSand', 'ReadyMixConcrete')) %>% 
+  mutate(Date = as.Date(Date, format = '%d/%m/%Y')) %>% 
+  mutate(Year = year(Date)) %>% 
+  mutate(Month = month(Date)) %>% 
+  mutate(Year = as.factor(Year)) %>% 
+  mutate(Month = as.factor(Month))
+
+sti <- read_csv('data/Index FTSE Strait Times.csv') %>% 
+  setNames(c('Date', 'Index')) %>% 
+  mutate(Date = as.Date(Date, format = '%d/%m/%Y')) %>% 
+  mutate(Year = year(Date)) %>% 
+  mutate(Month = month(Date)) %>% 
+  mutate(Day = day(Date)) %>% 
+  mutate(Year = as.factor(Year)) %>% 
+  mutate(Month = as.factor(Month))
+
+tbillbond <- read_csv('data/Treasury_Bill_Bond_ rates.csv') %>% 
+  setNames(c('Date', 'Bill1Yr', 'Bond2Yr', 'Bond5Yr', 'Bond10Yr', 'Bond15Yr', 'Bond20Yr','Bond30Yr')) %>% 
+  mutate(Date = as.Date(Date, format = '%d/%m/%Y')) %>% 
+  mutate(Year = year(Date)) %>% 
+  mutate(Month = month(Date)) %>% 
+  mutate(Day = day(Date)) %>% 
+  mutate(Year = as.factor(Year)) %>% 
+  mutate(Month = as.factor(Month)) %>% 
+  select(-Bond15Yr, -Bond20Yr, -Bond30Yr)
+
+sora <- read_csv('data/Singapore Overnight Rate Average SORA Daily.csv') %>% 
+  setNames(c('Date', 'Rate')) %>% 
+  mutate(Date = as.Date(Date, format = '%d/%m/%Y')) %>% 
+  mutate(Year = year(Date)) %>% 
+  mutate(Month = month(Date)) %>% 
+  mutate(Day = day(Date)) %>% 
+  mutate(Year = as.factor(Year)) %>% 
+  mutate(Month = as.factor(Month))
+```
+
+## 2.3 Data Wrangling
+
+The following code chunks are used to compute the change over a (quarterly) period (for SORA and Bond/Bill rates) and percentage change (for the property price indices, STI and prices of raw materials).
+
+::: panel-tabset
+#### Property Price Index
+
+The code chunk computes percentage change in property price index per quarter.
+
+```{r}
+#| code-fold: false
+ppi_quarter <- ppi %>% 
+  mutate(`PCChange_PR_All` = (PR_All - lag(PR_All))/lag(PR_All)*100) %>% 
+  mutate(`PCChange_PR_Landed` = (PR_Landed - lag(PR_Landed))/lag(PR_Landed)*100) %>% 
+  mutate(`PCChange_PR_NL_ALL` = (PR_NL_ALL - lag(PR_NL_ALL))/lag(PR_NL_ALL)*100) %>% 
+  mutate(`PCChange_PR_NL_CCR` = (PR_NL_CCR - lag(PR_NL_CCR))/lag(PR_NL_CCR)*100) %>% 
+  mutate(`PCChange_PR_NL_RCR` = (PR_NL_RCR - lag(PR_NL_RCR))/lag(PR_NL_RCR)*100) %>% 
+  mutate(`PCChange_PR_NL_OCR` = (PR_NL_OCR - lag(PR_NL_OCR))/lag(PR_NL_OCR)*100) %>% 
+  mutate(Quarter = case_when(
+    Month == 3 ~ 'Q1',
+    Month == 6 ~ 'Q2',
+    Month == 9 ~ 'Q3',
+    Month == 12 ~ 'Q4'
+  )) %>% 
+  select(-Month) %>% 
+  select('Year','Quarter',everything())
+```
+
+#### Raw material pricess
+
+The code chunk computes average monthly / quarterly values and percentage change in raw material prices per month / quarter.
+
+```{r}
+#| code-fold: false
+# material price_month - percentage change computations
+material_price_month <- material_price %>% 
+  mutate(`PCChange_Cement` = (Cement - lag(Cement))/lag(Cement)*100) %>% 
+  mutate(`PCChange_SteelBar` = (SteelBar - lag(SteelBar))/lag(SteelBar)*100) %>%
+  mutate(`PCChange_Granite` = (Granite - lag(Granite))/lag(Granite)*100) %>%
+  mutate(`PCChange_ConcretingSand` = (ConcretingSand - lag(ConcretingSand))/lag(ConcretingSand)*100) %>%
+  mutate(`PCChange_ReadyMixConcrete` = (ReadyMixConcrete - lag(ReadyMixConcrete))/lag(ReadyMixConcrete)*100) %>% 
+  select(-Date) %>% 
+  select(Year, Month, everything())
+
+# material price_quarter_avg - percentage change computations
+material_price_quarter_avg <- material_price %>%
+  mutate(Quarter = case_when(
+    (Month == 1 | Month == 2 | Month == 3) ~ 'Q1',
+    (Month == 4 | Month == 5 | Month == 6) ~ 'Q2',
+    (Month == 7 | Month == 8 | Month == 9) ~ 'Q3',
+    (Month == 10 | Month == 11 | Month == 12) ~ 'Q4'
+  )) %>%
+  select(-Date, -Month) %>%
+  group_by(Year, Quarter) %>% 
+  summarise_all(.funs=mean) %>% 
+  ungroup() %>% 
+  mutate(`PCChange_Cement` = (Cement - lag(Cement))/lag(Cement)*100) %>% 
+  mutate(`PCChange_SteelBar` = (SteelBar - lag(SteelBar))/lag(SteelBar)*100) %>%
+  mutate(`PCChange_Granite` = (Granite - lag(Granite))/lag(Granite)*100) %>%
+  mutate(`PCChange_ConcretingSand` = (ConcretingSand - lag(ConcretingSand))/lag(ConcretingSand)*100) %>%
+  mutate(`PCChange_ReadyMixConcrete` = (ReadyMixConcrete - lag(ReadyMixConcrete))/lag(ReadyMixConcrete)*100) %>% 
+  select(Year, Quarter, everything())
+```
+
+#### Straits Times Index
+
+The code chunk computes average monthly / quarterly values and percentage change in Straits Times Index per month / quarter.
+
+```{r}
+#| code-fold: false
+# sti_month_avg - percentage change computations
+sti_month_avg <- sti %>% 
+  group_by(Year, Month) %>% 
+  summarise_all(.funs=mean) %>%
+  ungroup() %>% 
+  mutate(`PCChange_Index` = (Index - lag(Index))/lag(Index)*100) %>% 
+  select(-Date, -Day) %>% 
+  select(Year, Month, everything())
+  
+# sti_quarter_avg - percentage change computations
+sti_quarter_avg <- sti %>% 
+  mutate(Quarter = case_when(
+    (Month == 1 | Month == 2 | Month == 3) ~ 'Q1',
+    (Month == 4 | Month == 5 | Month == 6) ~ 'Q2',
+    (Month == 7 | Month == 8 | Month == 9) ~ 'Q3',
+    (Month == 10 | Month == 11 | Month == 12) ~ 'Q4'
+  )) %>% 
+  select(-Date, -Month, -Day) %>%
+  group_by(Year, Quarter) %>% 
+  summarise_all(.funs=mean) %>%         
+  ungroup() %>%
+  mutate(`PCChange_Index` = (Index - lag(Index))/lag(Index)*100) %>% 
+  select(Year, Quarter, everything())
+```
+
+#### Bill and Bond rates
+
+The code chunk computes average monthly / quarterly values and change in rates per month / quarter.
+
+```{r}
+#| code-fold: false
+# tbillbond_month - rate change computations
+tbillbond_month_avg <- tbillbond %>% 
+  group_by(Year, Month) %>% 
+  summarise_all(.funs=mean) %>%
+  ungroup() %>% 
+  mutate(`Change_Bill1Yr` = Bill1Yr - lag(Bill1Yr)) %>% 
+  mutate(`Change_Bond2Yr` = Bond2Yr - lag(Bond2Yr)) %>% 
+  mutate(`Change_Bond5Yr` = Bond5Yr - lag(Bond5Yr)) %>% 
+  mutate(`Change_Bond10Yr` = Bond10Yr - lag(Bond10Yr)) %>% 
+  select(-Date, -Day) %>% 
+  select(Year, Month, everything())
+
+# tbillbond_quarter_avg - percentage change computations
+tbillbond_quarter_avg <- tbillbond %>% 
+  mutate(Quarter = case_when(
+    (Month == 1 | Month == 2 | Month == 3) ~ 'Q1',
+    (Month == 4 | Month == 5 | Month == 6) ~ 'Q2',
+    (Month == 7 | Month == 8 | Month == 9) ~ 'Q3',
+    (Month == 10 | Month == 11 | Month == 12) ~ 'Q4'
+  )) %>% 
+  select(-Date, -Month, -Day) %>% 
+  group_by(Year, Quarter) %>% 
+  summarise_all(.funs=mean) %>%
+  ungroup() %>%
+  mutate(`Change_Bill1Yr` = Bill1Yr - lag(Bill1Yr)) %>% 
+  mutate(`Change_Bond2Yr` = Bond2Yr - lag(Bond2Yr)) %>% 
+  mutate(`Change_Bond5Yr` = Bond5Yr - lag(Bond5Yr)) %>% 
+  mutate(`Change_Bond10Yr` = Bond10Yr - lag(Bond10Yr)) %>% 
+  select(Year, Quarter, everything())
+```
+
+#### SORA rate
+
+The code chunk computes average monthly / quarterly values and change in SORA per month / quarter.
+
+```{r}
+#| code-fold: false
+# sora_month - percentage change computations
+sora_month_avg <- sora %>% 
+  group_by(Year, Month) %>% 
+  summarise_all(.funs=mean) %>%
+  ungroup() %>% 
+  mutate(`Change_Rate` = Rate - lag(Rate)) %>% 
+  select(-Date, -Day) %>% 
+  select(Year, Month, everything())
+
+# sora_quarter_avg - percentage change computations
+sora_quarter_avg <- sora %>% 
+  mutate(Quarter = case_when(
+    (Month == 1 | Month == 2 | Month == 3) ~ 'Q1',
+    (Month == 4 | Month == 5 | Month == 6) ~ 'Q2',
+    (Month == 7 | Month == 8 | Month == 9) ~ 'Q3',
+    (Month == 10 | Month == 11 | Month == 12) ~ 'Q4'
+  )) %>%
+  select(-Date, -Month, -Day) %>%
+  group_by(Year, Quarter) %>% 
+  summarise_all(.funs=mean) %>%
+  ungroup() %>%
+  mutate(`Change_Rate` = Rate - lag(Rate)) %>% 
+  select(Year, Quarter, everything())
+```
+:::
+
+The following code chunks combines all the separate datasets into 2 datasets, one for monthly frequency data (excludes property price indices as they are released every quarter), and another for quarterly frequency. These 2 datasets will be used as the datasets for the various modules in the group project.
+
+```{r}
+#| code-summary: "Show code"
+# put all monthly data into 1 dataset
+data_by_month <- material_price_month %>% 
+  inner_join(sti_month_avg, by = c("Year", "Month")) %>% 
+  inner_join(tbillbond_month_avg, by = c("Year", "Month")) %>% 
+  inner_join(sora_month_avg, by = c("Year", "Month")) %>% 
+  mutate(MonthLabel = paste0(Month, 'M', as.character(Year))) %>% 
+  mutate(Date = as.Date(paste0('01-', Month, '-', Year), format="%d-%m-%Y")) %>% 
+  select(Date, MonthLabel, everything(), -Year, -Month)
+
+# put all quarter data into 1 dataset
+data_by_quarter <- ppi_quarter %>% 
+  inner_join(material_price_quarter_avg, by = c("Year", "Quarter")) %>% 
+  inner_join(sti_quarter_avg, by = c("Year", "Quarter")) %>% 
+  inner_join(tbillbond_quarter_avg, by = c("Year", "Quarter")) %>% 
+  inner_join(sora_quarter_avg, by = c("Year", "Quarter")) %>% 
+  mutate(QuarterLabel = paste0(Quarter, as.character(Year)))  %>% 
+  mutate(Date = paste0(Year, '-', ifelse(Quarter == "Q1", "03", 
+                                      ifelse(Quarter == "Q2", "06",
+                                             ifelse(Quarter == "Q3", "09", "12"))), "-01")) %>% 
+  mutate(Date = as.Date(Date)) %>% 
+  select(Date, QuarterLabel, everything(), -Year, -Quarter)
+```
+
+The code chunk below provides a summary of the datasets:
+
+::: panel-tabset
+#### Quarterly
+
+The code chunk shows a sample of the dataset.
+
+```{r}
+#| code-summary: "Show code"
+kable(head(data_by_quarter, 5))
+```
+
+The code chunk provides a summary of the dataset.
+
+```{r}
+#| code-summary: "Show code"
+kable(summary(data_by_quarter))
+```
+
+#### Monthly
+
+The code chunk shows a sample of the dataset.
+
+```{r}
+#| code-summary: "Show code"
+kable(head(data_by_month, 5))
+```
+
+The code chunk provides a summary of the dataset.
+
+```{r}
+#| code-summary: "Show code"
+kable(summary(data_by_quarter))
+```
+:::
+
+# 3 Prototyping
+
+## 3.1 Further data wrangling for nowcasting / forecasting
+
+The following code chunks splits the dataset according to actual values (i.e. actual indices and rates) or derived values (i.e. the change in values over a time period), and also calculates the time-lagged sequence of the dependent variables (i.e. the respective property price indices for overall and specific segments) for up to 4 periods (i.e. 4 quarters or a year).
+
+::: callout-important
+#### Important
+
+The user of the Shiny App will be **allowed to choose which property price index time series to use** for the prediction, as well as whether to use actual values or derived values for the prediction. The different property price index time series that are available are:
+
+-   Private Residential Property Price Index (Overall) - Variable: PR_All
+-   Private Residential Property Price Index (Landed) - Variable: PR_Landed
+-   Private Residential Property Price Index (Non-Landed) - Variable: PR_NL_ALL
+-   Private Residential Property Price Index (Non-landed, Core Central Region) - Variable: PR_NL_CCR
+-   Private Residential Property Price Index (Non-landed, Rest of Central Region) - Variable: PR_NL_RCR
+-   Private Residential Property Price Index (Non-landed, Outside of Central Region) - Variable: PR_NL_OCR
+:::
+
+```{r}
+#| code-summary: "Show code"
+# prepare dataset for actual values + lagged values (up to 4 lagged periods per dependent variable)
+data_quarter_actual <- data_by_quarter %>% 
+  select(Date, QuarterLabel, Cement, SteelBar, Granite, ConcretingSand, ReadyMixConcrete, Index, Bill1Yr, Bond2Yr, Bond5Yr, Bond10Yr, Rate, PR_All, PR_Landed, PR_NL_ALL, PR_NL_CCR, PR_NL_RCR, PR_NL_OCR) %>% 
+  mutate(PR_All_Lag_1 = lag(PR_All, 1), PR_All_Lag_2 = lag(PR_All, 2), PR_All_Lag_3 = lag(PR_All, 3), PR_All_Lag_4 = lag(PR_All, 4)) %>% 
+  mutate(PR_Landed_Lag_1 = lag(PR_Landed, 1), PR_Landed_Lag_2 = lag(PR_Landed, 2), PR_Landed_Lag_3 = lag(PR_Landed, 3), PR_Landed_Lag_4 = lag(PR_Landed, 4)) %>% 
+  mutate(PR_NL_ALL_Lag_1 = lag(PR_NL_ALL, 1), PR_NL_ALL_Lag_2 = lag(PR_NL_ALL, 2), PR_NL_ALL_Lag_3 = lag(PR_NL_ALL, 3), PR_NL_ALL_Lag_4 = lag(PR_NL_ALL, 4)) %>% 
+  mutate(PR_NL_CCR_Lag_1 = lag(PR_NL_CCR, 1), PR_NL_CCR_Lag_2 = lag(PR_NL_CCR, 2), PR_NL_CCR_Lag_3 = lag(PR_NL_CCR, 3), PR_NL_CCR_Lag_4 = lag(PR_NL_CCR, 4)) %>% 
+  mutate(PR_NL_RCR_Lag_1 = lag(PR_NL_RCR, 1), PR_NL_RCR_Lag_2 = lag(PR_NL_RCR, 2), PR_NL_RCR_Lag_3 = lag(PR_NL_RCR, 3), PR_NL_RCR_Lag_4 = lag(PR_NL_RCR, 4)) %>% 
+  mutate(PR_NL_OCR_Lag_1 = lag(PR_NL_OCR, 1), PR_NL_OCR_Lag_2 = lag(PR_NL_OCR, 2), PR_NL_OCR_Lag_3 = lag(PR_NL_OCR, 3), PR_NL_OCR_Lag_4 = lag(PR_NL_OCR, 4))
+  
+
+data_quarter_diff <- data_by_quarter %>% 
+  select(Date, QuarterLabel, PCChange_Cement, PCChange_SteelBar, PCChange_Granite, PCChange_ConcretingSand, PCChange_ReadyMixConcrete, PCChange_Index, Change_Bill1Yr, Change_Bond2Yr, Change_Bond5Yr, Change_Bond10Yr, Change_Rate, PCChange_PR_All, PCChange_PR_Landed, PCChange_PR_NL_ALL, PCChange_PR_NL_CCR, PCChange_PR_NL_RCR, PCChange_PR_NL_OCR) %>% 
+  setNames(c("Date", "QuarterLabel", "Cement", "SteelBar", "Granite", "ConcretingSand", "ReadyMixConcrete", "Index", "Bill1Yr", "Bond2Yr", "Bond5Yr", "Bond10Yr", "Rate", "PR_All", "PR_Landed", "PR_NL_ALL", "PR_NL_CCR", "PR_NL_RCR", "PR_NL_OCR")) %>% 
+  mutate(PR_All_Lag_1 = lag(PR_All, 1), PR_All_Lag_2 = lag(PR_All, 2), PR_All_Lag_3 = lag(PR_All, 3), PR_All_Lag_4 = lag(PR_All, 4)) %>% 
+  mutate(PR_Landed_Lag_1 = lag(PR_Landed, 1), PR_Landed_Lag_2 = lag(PR_Landed, 2), PR_Landed_Lag_3 = lag(PR_Landed, 3), PR_Landed_Lag_4 = lag(PR_Landed, 4)) %>% 
+  mutate(PR_NL_ALL_Lag_1 = lag(PR_NL_ALL, 1), PR_NL_ALL_Lag_2 = lag(PR_NL_ALL, 2), PR_NL_ALL_Lag_3 = lag(PR_NL_ALL, 3), PR_NL_ALL_Lag_4 = lag(PR_NL_ALL, 4)) %>% 
+  mutate(PR_NL_CCR_Lag_1 = lag(PR_NL_CCR, 1), PR_NL_CCR_Lag_2 = lag(PR_NL_CCR, 2), PR_NL_CCR_Lag_3 = lag(PR_NL_CCR, 3), PR_NL_CCR_Lag_4 = lag(PR_NL_CCR, 4)) %>% 
+  mutate(PR_NL_RCR_Lag_1 = lag(PR_NL_RCR, 1), PR_NL_RCR_Lag_2 = lag(PR_NL_RCR, 2), PR_NL_RCR_Lag_3 = lag(PR_NL_RCR, 3), PR_NL_RCR_Lag_4 = lag(PR_NL_RCR, 4)) %>% 
+  mutate(PR_NL_OCR_Lag_1 = lag(PR_NL_OCR, 1), PR_NL_OCR_Lag_2 = lag(PR_NL_OCR, 2), PR_NL_OCR_Lag_3 = lag(PR_NL_OCR, 3), PR_NL_OCR_Lag_4 = lag(PR_NL_OCR, 4))
+```
+
+The code chunk below shows the function used to compute index values when percentage change in property price index value is predicted.
+
+```{r}
+#| code-fold: false
+recover_actual <- function(predict_diff, start) {
+  index = start
+  for (i in 1:nrow(predict_diff)) {
+    index = (1 + predict_diff$Predicted[i]/100) * index
+    predict_diff$Predicted[i] = index
+  }
+  return(predict_diff)
+}
+```
+
+::: callout-note
+#### Note
+
+Functions is a useful way of abstracting portions of similar code functionality that are used by different models.
+:::
+
+## 3.2 Prototype of Random Forest model
+
+The prototype uses **randomForest()** of the randomForest package to model the property price index using explanatory variable for forecasting, to make predictions on the subsequent periods based on new / unseen data.
+
+::: callout-important
+#### Parameters for user inputs
+
+The following will be made available as user inputs:
+
+-   Variables selection
+    -   Type of data to use for prediction - Select from possible values of 'actual' or 'diff.
+    -   Forecast from which year - Select from possible values of 2018 to 2022
+    -   Explanatory variables - Select from list of explanatory variables (raw material prices, STI, Bond/bill rates, SORA rate)
+    -   Which property price index to forecast - Select from a list of property price indices (refer to 3.1 for list)
+-   Model parameters
+    -   Number of trees (mtree) - Select from possible values of 100 to 500
+    -   Number of variables sampled for each tree (mtry) - Select from possible values of 2 to 8
+    -   Maximal size of terminal nodes in each tree (nodesize) - Select from possible values of 1 to 8
+:::
+
+The code chunk below simulates the user inputs from the Shiny App:
+
+```{r}
+#| code-summary: "Show code"
+# set random seed to get consistent result
+set.seed(123)
+
+# choose whether to model actual values or difference across periods ('actual' or 'diff)
+data_selected = data_quarter_diff
+selected = "diff"
+# this is cutoff value of year for testing data selection                    
+cut_off_year = 2020
+# to do if/case statement in Shiny for switching between different time series
+data_selected <- data_selected %>% 
+  rename(dependentVariable = PR_All)
+data_actual_temp <- data_quarter_actual %>% 
+  rename(dependentVariable = PR_All) %>% 
+  select(Date, dependentVariable)
+
+# to store explanatory variables - will be user inputs
+explanatory <- c("Cement", "SteelBar", "Granite", "ConcretingSand", "ReadyMixConcrete", "Index", "Bill1Yr", "Bond2Yr", "Bond5Yr", "Bond10Yr", "Rate", 'PR_All_Lag_1', 'PR_All_Lag_2', 'PR_All_Lag_3', 'PR_All_Lag_4')
+# to store dependent variable to model
+dependent <- c("PR_All")
+# variable for number of trees - user input (values from 100 - 500)
+ntree <- 300
+# number of variables sampled for tree (values from 2 - 8)
+mtry <- 6
+# maximal size of terminal nodes in each tree (values from 1 - 8)
+nodesize <- 6
+```
+
+The code chunk below shows the preparation of the dataset based on user selected inputs, including the partitioning of the dataset into training and testing datasets based on the user selected year to start forecasting from.
+
+```{r}
+#| code-summary: "Show code"
+# preparing the dataset based on user selected variables
+ppi_rf_train <- subset(data_selected, as.numeric(year(Date)) < cut_off_year) %>% 
+  select(-Date, -QuarterLabel) %>%
+  select(all_of(explanatory), dependentVariable) %>% 
+  na.omit()
+ppi_rf_test <- subset(data_selected, as.numeric(year(Date)) >= cut_off_year) %>% 
+  select(-Date, -QuarterLabel) %>% 
+  select(all_of(explanatory), dependentVariable)
+```
+
+The code chunk below uses **randomForest()** to create the model using the training dataset with the user selected model parameters.
+
+```{r}
+#| code-summary: "Show code"
+# specifying the model based on user selected variables for the model
+rf_model <- randomForest(dependentVariable ~ ., data = ppi_rf_train, ntree = ntree, mtry = mtry, nodesize = nodesize, importance = T, na.action = na.omit)  
+```
+
+The following code chunks uses the trained model for predictions on the test data, and the results are shown as ggploty plots. The result plots provided are:
+
+-   Tab 1:
+    -   Predicted vs actual values
+    -   Residuals
+-   Tab 2
+    -   Variable importance
+-   Tab 3:
+    -   Predicted time series
+
+```{r}
+#| code-summary: "Show code"
+
+# using trained model to predict both training and test dataset and calculate RMSE
+predictions_train <- predict(rf_model, newdata = ppi_rf_train)
+rmse_train <- sqrt(mean((ppi_rf_train$dependentVariable - predictions_train)^2))
+mae_train <- mean(abs(ppi_rf_train$dependentVariable - predictions_train))
+
+predictions <- predict(rf_model, newdata = ppi_rf_test)
+rmse_test <- sqrt(mean((ppi_rf_test$dependentVariable - predictions)^2))
+mae_test <- mean(abs(ppi_rf_test$dependentVariable - predictions))
+
+printout <- data.frame(
+  Error = c('RMSE', 'MAE'),
+  Train = c(rmse_train, mae_train),
+  Test = c(rmse_test, mae_test))
+
+# Tab 1 - plot actual vs predicted
+results <- data.frame(Actual = ppi_rf_test$dependentVariable, Predicted = predictions, "DataPartition" = "Test")
+train_test <- data.frame(Actual = ppi_rf_train$dependentVariable, Predicted = predictions_train, "DataPartition" = "Train") %>% 
+  bind_rows(results)
+x_lim_min <- floor(train_test['Actual'] %>% min())
+y_lim_min <- floor(train_test['Predicted'] %>% min())
+x_lim_max <- ceiling(train_test['Actual'] %>% max())
+y_lim_max <- ceiling(train_test['Predicted'] %>% max())
+
+p1a <- ggplot(data = train_test, 
+             aes(x = Actual, 
+                 y = Predicted, 
+                 color = DataPartition)) +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +  # Add a diagonal line for reference
+  geom_point(alpha = 0.5) +
+  labs(x = "Actual", 
+       y = "Predicted", 
+       title = "Actual vs. Predicted Values") + 
+  scale_x_continuous(limits = c(min(x_lim_min, y_lim_min), max(x_lim_max, y_lim_max))) +
+  scale_y_continuous(limits = c(min(x_lim_min, y_lim_min), max(x_lim_max, y_lim_max))) +
+  theme_bw()
+
+# Tab 1 - to plot residuals
+train_test$Residuals <- train_test$Actual - train_test$Predicted
+p1b <- ggplot(data=train_test, aes(x=Predicted, y=Residuals, colour = DataPartition)) + 
+  geom_point() +
+  geom_hline(yintercept=0, color = 'Red', linetype = 'dashed') +
+  labs(title = "Residual Plot") +
+  theme_bw()
+
+# Tab 3 - to plot time series of index (with forecasting)
+
+if (selected == "diff") {
+  results <- recover_actual(results, data_actual_temp$dependentVariable[nrow(data_actual_temp) - nrow(results)])
+}
+ 
+results <- results %>% 
+  mutate(Date = (data_actual_temp$Date[(nrow(data_actual_temp) - nrow(results) + 1) : (nrow(data_actual_temp))]))
+ 
+p1c <- ggplot() +
+  geom_line(data=data_actual_temp,
+            aes(x = Date, y = dependentVariable),
+            colour = "green",
+            size = 0.7) +
+  geom_line(data=results,
+            aes(x=Date, y = Predicted, color = DataPartition),
+            linetype = 'dotted',
+            size = 0.7) +
+  labs(y = "Price Index",
+       x = 'Year',
+       title = "Time Series of Quarterly Price Index (Actual index in green)") +
+  theme_bw()
+
+```
+
+The prototype plots are:
+
+::: panel-tabset
+#### Tab 1 - Prediction results using model
+
+```{r}
+#| code-summary: "Show code" 
+ggplotly(p1a) 
+ggplotly(p1b)  
+kable (printout)
+```
+
+#### Tab 2 - Variable Importance
+
+```{r}
+#| code-summary: "Show code" 
+varImpPlot(rf_model) 
+```
+
+#### Tab 3 - Predicted time series
+
+```{r}
+#| code-summary: "Show code" 
+ggplotly(p1c)
+```
+:::
+
+## 3.3 Prototype of Gradient Boost Model
+
+The prototype uses **gbm()** of the gbm package to model the property price index using explanatory variable for forecasting, to make predictions on the subsequent periods based on new / unseen data.
+
+::: callout-important
+#### Parameters for user inputs
+
+The following will be made available as user inputs:
+
+-   Variables selection
+    -   Type of data to use for prediction - Select from possible values of 'actual' or 'diff.
+    -   Forecast from which year - Select from possible values of 2018 to 2022
+    -   Explanatory variables - Select from list of explanatory variables (raw material prices, STI, Bond/bill rates, SORA rate)
+    -   Which property price index to forecast - Select from a list of property price indices (refer to 3.1 for list)
+-   Model parameters
+    -   Number of trees (n.trees) - Select from possible values of 100 to 500
+    -   Maximum depth of each tree (interaction.depth) - Select from possible values of 4 to 10
+    -   Learning rate (shrinkage) - Select from possible values of 0.01 to 0.1
+    -   Minimum number of observations in terminal node (n.minobsinnode) - Select from possible values of 5 to 10
+    -   Fraction of observations sampled for each tree (bag.fraction) - Select from possible values of 0.5 to 1.0
+    -   Distribution to use - Select from 'gaussian', 'laplace' or 'tdist' for regression models
+:::
+
+The code chunk below simulates the user inputs from the Shiny App:
+
+```{r}
+#| code-summary: "Show code"
+# set random seed to get consistent result
+set.seed(123)
+
+# choose whether to model actual values or difference across periods
+data_selected <- data_quarter_diff
+selected = "diff"
+# this is cutoff value of year for training/testing data selection                
+cut_off_year <- 2020
+# to store explanatory variables - will be user inputs
+explanatory <- c("Cement", "SteelBar", "Granite", "ConcretingSand", "ReadyMixConcrete", "Index", "Bill1Yr", "Bond2Yr", "Bond5Yr", "Bond10Yr", "Rate", 'PR_All_Lag_1', 'PR_All_Lag_2', 'PR_All_Lag_3', 'PR_All_Lag_4')
+# to store dependent variable to model
+dependent <- c("PR_All")
+# to do case stetament in Shiny for switching between different time series
+data_selected <- data_selected %>% 
+  rename(dependentVariable = PR_All)
+data_actual_temp <- data_quarter_actual %>% 
+  rename(dependentVariable = PR_All) %>% 
+  select(Date, dependentVariable)
+
+# variable for number of trees (values from 100 to 500)
+n.trees <- 300
+# maximum depth of each tree (values from 4 to 10)
+interaction.depth <- 4
+# learning rate (values from 0.01 to 0.1)
+shrinkage = 0.01
+# minimum number of observations required in a terminal node (values 5 to 10)
+n.minobsinnode <- 5
+# fraction of observations sampled without replacement for each tree (values 0.5 to 1.0)
+bag.fraction <- 0.5
+# select name of distribution to use (values are 'gaussian', 'laplace', 'tdist')
+distribution <- 'gaussian'
+
+```
+
+The code chunk below shows the preparation of the dataset based on user selected inputs, including the partitioning of the dataset into training and testing datasets based on the user selected year to start forecasting from.
+
+```{r}
+#| code-summary: "Show code"
+ppi_gb_train <- subset(data_selected, as.numeric(year(Date)) < cut_off_year) %>% 
+  select(-Date, -QuarterLabel) %>%
+  select(all_of(explanatory), dependentVariable) %>% 
+  na.omit()
+
+ppi_gb_test <- subset(data_selected, as.numeric(year(Date)) >= cut_off_year) %>% 
+  select(-Date, -QuarterLabel) %>% 
+  select(all_of(explanatory), dependentVariable)
+```
+
+The code chunk below uses **gbm()** to create the model using the training dataset with the user selected model parameters.
+
+```{r}
+#| code-summary: "Show code"
+gb_model <- gbm(dependentVariable ~ ., data = ppi_gb_train, distribution = distribution, n.trees = n.trees, interaction.depth = interaction.depth, shrinkage = shrinkage, n.minobsinnode = n.minobsinnode, bag.fraction = bag.fraction, train.fraction = 1)
+```
+
+The following code chunks uses the trained model for predictions on the test data, and the results are shown as ggploty plots. The result plots provided are:
+
+-   Tab 1:
+    -   Predicted vs actual values
+    -   Residuals
+-   Tab 2:
+    -   Predicted time series
+
+```{r}
+#| code-summary: "Show code"
+# using trained model to predict both training and test dataset and calculate RMSE
+predictions_train <- predict(gb_model, newdata = ppi_gb_train)
+rmse_train <- sqrt(mean((ppi_gb_train$dependentVariable - predictions_train)^2))
+mae_train <- mean(abs(ppi_rf_train$dependentVariable - predictions_train))
+
+predictions <- predict(gb_model, newdata = ppi_gb_test)
+rmse <- sqrt(mean((ppi_gb_test$dependentVariable - predictions)^2))
+mae_test <- mean(abs(ppi_rf_test$dependentVariable - predictions))
+
+printout <- data.frame(
+  Error = c('RMSE', 'MAE'),
+  Train = c(rmse_train, mae_train),
+  Test = c(rmse_test, mae_test))
+
+# Tab 1 - plot actual vs predicted
+results <- data.frame(Actual = ppi_gb_test$dependentVariable, Predicted = predictions, "DataPartition" = "Test")
+train_test <- data.frame(Actual = ppi_gb_train$dependentVariable, Predicted = predictions_train, "DataPartition" = "Train") %>% 
+  bind_rows(results)
+x_lim_min <- floor(train_test['Actual'] %>% min())
+y_lim_min <- floor(train_test['Predicted'] %>% min())
+x_lim_max <- ceiling(train_test['Actual'] %>% max())
+y_lim_max <- ceiling(train_test['Predicted'] %>% max())
+
+p2a <- ggplot(data = train_test, 
+             aes(x = Actual, 
+                 y = Predicted, 
+                 color = DataPartition)) +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +  # Add a diagonal line for reference
+  geom_point(alpha = 0.5) +
+  labs(x = "Actual", 
+       y = "Predicted", 
+       title = "Actual vs. Predicted Values") + 
+  scale_x_continuous(limits = c(min(x_lim_min, y_lim_min), max(x_lim_max, y_lim_max))) +
+  scale_y_continuous(limits = c(min(x_lim_min, y_lim_min), max(x_lim_max, y_lim_max))) +
+  theme_bw()
+
+
+# Tab 1 - to plot residuals
+train_test$Residuals <- train_test$Actual - train_test$Predicted
+p2b <- ggplot(data=train_test, aes(x=Predicted, y=Residuals, colour = DataPartition)) + 
+  geom_point() +
+  geom_hline(yintercept=0, color = 'Red', linetype = 'dashed') +
+  labs(title = "Residual Plot") +
+  theme_bw()
+
+# Tab 2 - to plot time series of index (with forecasting)
+
+if (selected == "diff") {
+  results <- recover_actual(results, data_actual_temp$dependentVariable[nrow(data_actual_temp) - nrow(results)]) %>% 
+    mutate(Date = (data_actual_temp$Date[(nrow(data_actual_temp) - nrow(results) + 1) : (nrow(data_actual_temp))]))
+}
+
+results <- results %>% 
+  mutate(Date = (data_actual_temp$Date[(nrow(data_actual_temp) - nrow(results) + 1) : (nrow(data_actual_temp))]))
+
+p2c <- ggplot() +
+  geom_line(data=data_actual_temp,
+            aes(x = Date, y = dependentVariable),
+            colour = "green",
+            size = 0.7) +
+  geom_line(data=results,
+            aes(x=Date, y = Predicted, color = DataPartition),
+            linetype = 'dotted',
+            size = 0.7) +
+  labs(y = "Price Index",
+       x = 'Year',
+       title = "Time Series of Quarterly Price Index (Actual index in green)") +
+  theme_bw()
+
+```
+
+The prototype plots are:
+
+::: panel-tabset
+#### Tab 1 - Prediction results using model
+
+```{r}
+#| code-summary: "Show code" 
+ggplotly(p2a) 
+ggplotly(p2b)  
+kable (printout)
+```
+
+#### Tab 2 - Predicted time series
+
+```{r}
+#| code-summary: "Show code" 
+ggplotly(p2c)
+```
+:::
+
+## 3.4 Prototype of Prophet Model
+
+The prototype uses **prophet()** of the Prophet package to model the property price index using explanatory variable for forecasting, to make predictions on the subsequent periods based on new / unseen data.
+
+::: callout-important
+#### Parameters for user inputs
+
+The following will be made available as user inputs:
+
+-   Variables selection
+    -   Type of data to use for prediction - Select from possible values of 'actual' or 'diff.
+    -   Forecast from which year - Select from possible values of 2018 to 2022
+    -   Explanatory variables - Select from list of explanatory variables (raw material prices, STI, Bond/bill rates, SORA rate)
+    -   Which property price index to forecast - Select from a list of property price indices (refer to 3.1 for list)
+-   Model parameters
+    -   Mode for handling seasonalities (seasonality.mode) - Select from additive' (default) or 'multiplicative'
+    -   Growth modeling (growth) - Select from 'linear', 'logistic', 'flat'
+    -   Fit yearly seasonality (yearly.seasonality) - Select from values 'auto', TRUE, FALSE
+:::
+
+The code chunk below simulates the user inputs from the Shiny App:
+
+```{r}
+#| code-summary: "Show code" 
+# choose whether to model actual values or difference across periods
+data_selected = data_quarter_actual
+selected = "actual"
+# this is cutoff value of year for training/testing data selection                
+cut_off_year = 2020
+# to store explanatory variables - will be user inputs
+explanatory <- c("Cement", "SteelBar", "Granite", "ConcretingSand", "ReadyMixConcrete", "Index", "Bill1Yr", "Bond2Yr", "Bond5Yr", "Bond10Yr", "Rate", 'PR_All_Lag_1', 'PR_All_Lag_2', 'PR_All_Lag_3', 'PR_All_Lag_4')
+# to store dependent variable to model
+dependent <- c("PR_All")
+# to do case stetament in Shiny for switching between different time series
+data_selected <- data_selected %>% 
+  rename(y = PR_All)
+data_actual_temp <- data_quarter_actual %>% 
+  rename(y = PR_All) %>% 
+  select(Date, y)
+
+# modes for handling seasonalities (Either 'additive' (default) or 'multiplicative')
+seasonality.mode = 'multiplicative'
+# Prophet allows for logistic growth modeling by default but can be adjusted for linear growth (values are 'linear', 'logistic', 'flat')
+growth = 'linear'
+# Fit yearly seasonality (values are 'auto', TRUE, FALSE)
+yearly.seasonality = 'auto'
+```
+
+The code chunk below shows the preparation of the dataset based on user selected inputs, including the partitioning of the dataset into training and testing datasets based on the user selected year to start forecasting from.
+
+```{r}
+#| code-summary: "Show code" 
+ppi_pp_train <- subset(data_selected, as.numeric(year(Date)) < cut_off_year) %>% 
+  select(-QuarterLabel) %>%
+  select(Date, all_of(explanatory), y) %>% 
+  rename(ds = Date) %>% 
+  na.omit()
+
+ppi_pp_test <- subset(data_selected, as.numeric(year(Date)) >= cut_off_year) %>% 
+  select(-QuarterLabel) %>% 
+  select(Date, all_of(explanatory), y) %>% 
+  rename(ds = Date)
+```
+
+The code chunk below uses **prophet()** to create the model using the training dataset with the user selected model parameters.
+
+```{r}
+#| code-summary: "Show code" 
+pp_model <- prophet(seasonality.mode = seasonality.mode, growth = growth, yearly.seasonality = yearly.seasonality, uncertainty.samples = 500)
+
+# to select regressors based on user inputs
+pp_model <- add_regressor(pp_model, 'Cement')
+pp_model <- add_regressor(pp_model, 'SteelBar')
+pp_model <- add_regressor(pp_model, 'Granite')
+pp_model <- add_regressor(pp_model, 'ConcretingSand')
+pp_model <- add_regressor(pp_model, 'ReadyMixConcrete')
+pp_model <- add_regressor(pp_model, 'PR_All_Lag_1')
+pp_model <- add_regressor(pp_model, 'PR_All_Lag_2')
+pp_model <- add_regressor(pp_model, 'PR_All_Lag_3')
+pp_model <- add_regressor(pp_model, 'PR_All_Lag_4')
+
+pp_model <- fit.prophet(pp_model, ppi_pp_train)
+```
+
+The following code chunks uses the trained model for predictions on the test data, and the results are shown as ggploty plots. The result plots provided are:
+
+-   Tab 1:
+    -   Predicted vs actual values
+    -   Residuals
+-   Tab 2:
+    -   Predicted time series
+
+```{r}
+#| code-summary: "Show code" 
+
+forecast_train <- predict(pp_model, ppi_pp_train)
+forecast <- predict(pp_model, ppi_pp_test)
+
+# Tab 1 - plot actual vs predicted
+train_predict <- forecast_train %>% 
+  select(ds, yhat) %>% 
+  mutate("DataPartition" = "Train") %>% 
+  mutate('Actual' = ppi_pp_train$y) %>% 
+  rename(Date=ds, Predicted=yhat)
+test_predict <- forecast %>% 
+  select(ds, yhat) %>% 
+  mutate("DataPartition" = "Test") %>% 
+  mutate('Actual' = ppi_pp_test$y) %>% 
+  rename(Date=ds, Predicted=yhat)
+train_test <- train_predict %>% 
+  bind_rows(test_predict) 
+
+# compute RMSE and MAE
+rmse_train <- sqrt(mean((train_predict$Actual - train_predict$Predicted)^2))
+mae_train <- mean(abs(train_predict$Actual - train_predict$Predicted))
+
+rmse_test <- sqrt(mean((test_predict$Actual - test_predict$Predicted)^2))
+mae_test <- mean(abs(test_predict$Actual - test_predict$Predicted))
+
+printout <- data.frame(
+  Error = c('RMSE', 'MAE'),
+  Train = c(rmse_train, mae_train),
+  Test = c(rmse_test, mae_test))
+
+
+x_lim_min <- floor(train_test['Actual'] %>% min())
+y_lim_min <- floor(train_test['Predicted'] %>% min())
+x_lim_max <- ceiling(train_test['Actual'] %>% max())
+y_lim_max <- ceiling(train_test['Predicted'] %>% max())
+
+p3a <- ggplot(data = train_test, 
+             aes(x = Actual, 
+                 y = Predicted, 
+                 color = DataPartition)) +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +  # Add a diagonal line for reference
+  geom_point(alpha = 0.5) +
+  labs(x = "Actual", 
+       y = "Predicted", 
+       title = "Actual vs. Predicted Values") + 
+  scale_x_continuous(limits = c(min(x_lim_min, y_lim_min), max(x_lim_max, y_lim_max))) +
+  scale_y_continuous(limits = c(min(x_lim_min, y_lim_min), max(x_lim_max, y_lim_max))) +
+  theme_bw()
+
+# Tab 1 - to plot residuals
+train_test$Residuals <- train_test$Actual - train_test$Predicted
+p3b <- ggplot(data=train_test, aes(x=Predicted, y=Residuals, colour = DataPartition)) + 
+  geom_point() +
+  geom_hline(yintercept=0, color = 'Red', linetype = 'dashed') +
+  labs(title = "Residual Plot") +
+  theme_bw()
+
+# Tab 2 - to plot time series of index (with forecasting)
+results <- test_predict
+data_actual_temp <- data_actual_temp %>% 
+  rename(dependentVariable = y)
+if (selected == "diff") {
+  results <- recover_actual(results, data_actual_temp$dependentVariable[nrow(data_actual_temp) - nrow(results)]) %>% 
+    mutate(Date = (data_actual_temp$Date[(nrow(data_actual_temp) - nrow(results) + 1) : (nrow(data_actual_temp))]))
+}
+
+results <- results %>% 
+  mutate(Date = (data_actual_temp$Date[(nrow(data_actual_temp) - nrow(results) + 1) : (nrow(data_actual_temp))]))
+
+p3c <- ggplot() +
+  geom_line(data=data_actual_temp,
+            aes(x = Date, y = dependentVariable),
+            colour = "green",
+            size = 0.7) +
+  geom_line(data=results,
+            aes(x = Date, y = Predicted, color = DataPartition),
+            linetype = 'dotted',
+            size = 0.7) +
+  labs(y = "Price Index",
+       x = 'Year',
+       title = "Time Series of Quarterly Price Index (Actual index in green)") +
+  theme_bw()
+```
+
+The prototype plots are:
+
+::: panel-tabset
+#### Tab 1 - Prediction results using model
+
+```{r}
+#| code-summary: "Show code"  
+ggplotly(p3a)  
+ggplotly(p3b)   
+kable (printout)
+```
+
+#### Tab 2 - Predicted time series
+
+```{r}
+#| code-summary: "Show code"  
+ggplotly(p3c)  
+```
+:::
+
+# 4 UI Design
+
+## 4.1 Storyboard and UI Design for Random Forest module
+
+::: {.callout-note icon="false"}
+#### Selection of Shiny UI components for parameter inputs
+
+UI components for parameter inputs are:
+
+-   Variables selection
+    -   Type of data to use for prediction - Use **Toggle Input** to toggle between actual indices and derived percentage change
+    -   Forecast from which year - Use **Slider Input**, values from 2018 to 2022
+    -   Explanatory variables - Use **Select Input** to choose from a pre-defined list
+    -   Which property price index to forecast - Use **Select Input** to choose from a pre-defined list
+-   Model parameters
+    -   Number of trees (mtree) - Use **Slider Input**, values from 100 to 500
+    -   Number of variables sampled for each tree (mtry) - Use **Slider Input,** values from 2 to 8
+    -   Maximal size of terminal nodes in each tree (nodesize) - Use **Slider Input,** values from 1 to 8
+-   **Submit Button** for user to run the model with the inputs selected
+:::
+
+::: panel-tabset
+#### Tab 1 - Model Result
+
+![](images/clipboard-4084086158.png)
+
+#### Tab 2 - Variable Importance
+
+![](images/clipboard-3611799609.png)
+
+#### Tab 3 - Time Series
+
+![](images/clipboard-3886939445.png)
+:::
+
+## 4.2 Storyboard and UI Design for Gradient Boost module
+
+::: {.callout-note icon="false"}
+#### Selection of Shiny UI components for parameter inputs
+
+UI components for parameter inputs are:
+
+-   Variables selection
+    -   Type of data to use for prediction - Use **Toggle Input** to toggle between actual indices and derived percentage change
+    -   Forecast from which year - Use **Slider Input**, values from 2018 to 2022
+    -   Explanatory variables - Use **Select Input** to choose from a pre-defined list
+    -   Which property price index to forecast - Use **Select Input** to choose from a pre-defined list
+-   Model parameters
+    -   Number of trees (n.trees) - Use **Slider Input**, values from 100 to 500
+    -   Maximum depth of each tree (interaction.depth) - Use **Slider Input**, values from 4 to 10
+    -   Learning rate (shrinkage) - Use **Slider Input**, values from 0.01 to 0.1
+    -   Minimum number of observations in terminal node (n.minobsinnode) - Use **Slider Input**, values from 5 to 10
+    -   Fraction of observations sampled for each tree (bag.fraction) - Use **Slider Input**, values from 0.5 to 1.0
+    -   Distribution to use - Use **Select Input** to choose from 'gaussian', 'laplace' or 'tdist' for regression models
+-   **Submit Button** for user to run the model with the inputs selected
+:::
+
+::: panel-tabset
+#### Tab 1 - Model Result
+
+![](images/clipboard-2178951649.png)
+
+#### Tab 2 - Time Series
+
+![](images/clipboard-640767665.png)
+:::
+
+## 4.3 Storyboard and UI Design for Prophet module
+
+::: {.callout-note icon="false"}
+#### Selection of Shiny UI components for parameter inputs
+
+UI components for parameter inputs are:
+
+-   Variables selection
+    -   Type of data to use for prediction - Use **Toggle Input** to toggle between actual indices and derived percentage change
+    -   Forecast from which year - Use **Slider Input**, values from 2018 to 2022
+    -   Explanatory variables - Use **Select Input** to choose from a pre-defined list
+    -   Which property price index to forecast - Use **Select Input** to choose from a pre-defined list
+-   Model parameters
+    -   Mode for handling seasonalities (seasonality.mode) - Use **Select Input** to choose from additive' (default) or 'multiplicative'
+    -   Growth modeling (growth) - Use **Select Input** to choose from 'linear', 'logistic', 'flat'
+    -   Fit yearly seasonality (yearly.seasonality) - Use **Select Input** to choose from values 'auto', TRUE, FALSE
+-   **Submit Button** for user to run the model with the inputs selected
+:::
+
+::: panel-tabset
+#### Tab 1 - Model Result
+
+![](images/clipboard-3667159418.png)
+
+#### Tab 2 - Time Series
+
+![](images/clipboard-374491442.png)
+:::
+
+# 5 Conclusion
+
+Through this prototyping exercise, I have managed to identify the necessary R packages needed to build the forecasting models, and used them to build the prototype models. Furthermore, I had also determined the model variables and parameters that will be exposed for users to choose from, as well as identified useful outputs in terms of plots that will be presented to the user on the R Shiny application subsequently. The appropriate Shiny UI components were also identified, following these principles of (1) using a toggle for toggling between 2 values, (2) using a select list where users should choose from a pre-defined list, and (3) using a slider bar for range of numerical values.
+
+All in all, the codes are ready to be integrated into a R Shiny App, and through this, I have experienced the usefulness of prototyping in application development.
