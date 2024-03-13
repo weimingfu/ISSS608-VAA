@@ -619,7 +619,6 @@ The following will be made available as user inputs:
     -   Which property price index to forecast - Select from a list of property price indices (refer to 3.1 for list)
 -   Model parameters
     -   Number of trees (n.trees) - Select from possible values of 100 to 500
-    -   Maximum depth of each tree (interaction.depth) - Select from possible values of 4 to 10
     -   Learning rate (shrinkage) - Select from possible values of 0.01 to 0.1
     -   Minimum number of observations in terminal node (n.minobsinnode) - Select from possible values of 5 to 10
     -   Fraction of observations sampled for each tree (bag.fraction) - Select from possible values of 0.5 to 1.0
@@ -651,8 +650,6 @@ data_actual_temp <- data_quarter_actual %>%
 
 # variable for number of trees (values from 100 to 500)
 n.trees <- 300
-# maximum depth of each tree (values from 4 to 10)
-interaction.depth <- 4
 # learning rate (values from 0.01 to 0.1)
 shrinkage = 0.01
 # minimum number of observations required in a terminal node (values 5 to 10)
@@ -682,7 +679,7 @@ The code chunk below uses **gbm()** to create the model using the training datas
 
 ```{r}
 #| code-summary: "Show code"
-gb_model <- gbm(dependentVariable ~ ., data = ppi_gb_train, distribution = distribution, n.trees = n.trees, interaction.depth = interaction.depth, shrinkage = shrinkage, n.minobsinnode = n.minobsinnode, bag.fraction = bag.fraction, train.fraction = 1)
+gb_model <- gbm(dependentVariable ~ ., data = ppi_gb_train, distribution = distribution, n.trees = n.trees, interaction.depth = 10, shrinkage = shrinkage, n.minobsinnode = n.minobsinnode, bag.fraction = bag.fraction, train.fraction = 1)
 ```
 
 The following code chunks uses the trained model for predictions on the test data, and the results are shown as ggploty plots. The result plots provided are:
@@ -698,11 +695,11 @@ The following code chunks uses the trained model for predictions on the test dat
 # using trained model to predict both training and test dataset and calculate RMSE
 predictions_train <- predict(gb_model, newdata = ppi_gb_train)
 rmse_train <- sqrt(mean((ppi_gb_train$dependentVariable - predictions_train)^2))
-mae_train <- mean(abs(ppi_rf_train$dependentVariable - predictions_train))
+mae_train <- mean(abs(ppi_gb_train$dependentVariable - predictions_train))
 
 predictions <- predict(gb_model, newdata = ppi_gb_test)
 rmse <- sqrt(mean((ppi_gb_test$dependentVariable - predictions)^2))
-mae_test <- mean(abs(ppi_rf_test$dependentVariable - predictions))
+mae_test <- mean(abs(ppi_gb_test$dependentVariable - predictions))
 
 printout <- data.frame(
   Error = c('RMSE', 'MAE'),
@@ -1033,7 +1030,6 @@ UI components for parameter inputs are:
     -   Which property price index to forecast - Use **Select Input** to choose from a pre-defined list
 -   Model parameters
     -   Number of trees (n.trees) - Use **Slider Input**, values from 100 to 500
-    -   Maximum depth of each tree (interaction.depth) - Use **Slider Input**, values from 4 to 10
     -   Learning rate (shrinkage) - Use **Slider Input**, values from 0.01 to 0.1
     -   Minimum number of observations in terminal node (n.minobsinnode) - Use **Slider Input**, values from 5 to 10
     -   Fraction of observations sampled for each tree (bag.fraction) - Use **Slider Input**, values from 0.5 to 1.0
@@ -1044,11 +1040,11 @@ UI components for parameter inputs are:
 ::: panel-tabset
 #### Tab 1 - Model Result
 
-![](images/clipboard-2178951649.png)
+![](images/clipboard-6047130.png)
 
 #### Tab 2 - Time Series
 
-![](images/clipboard-640767665.png)
+![](images/clipboard-3922706272.png) 
 :::
 
 ## 4.3 Storyboard and UI Design for Prophet module
